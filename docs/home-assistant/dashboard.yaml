@@ -3,18 +3,34 @@ views:
   - title: Kindle
     cards:
       - type: entities
-        title: KOReader
+        title: Livro
         entities:
           - binary_sensor.koreader_reading
           - sensor.koreader_book_title
           - sensor.koreader_book_author
+          - sensor.koreader_book_series
+          - sensor.koreader_book_format
+          - sensor.koreader_book_language
           - sensor.koreader_chapter
           - sensor.koreader_current_page
           - sensor.koreader_total_pages
+          - sensor.koreader_pages_left
+          - sensor.koreader_pages_left_in_chapter
+          - sensor.koreader_time_to_finish_book
+          - sensor.koreader_time_to_finish_chapter
+          - sensor.koreader_annotations
+      - type: entities
+        title: Controle
+        entities:
           - binary_sensor.koreader_charging
           - switch.koreader_wifi
+          - switch.koreader_frontlight
           - number.koreader_frontlight
+          - number.koreader_warmth
           - button.koreader_force_sync
+          - button.koreader_next_page
+          - button.koreader_previous_page
+          - button.koreader_refresh_screen
       - type: gauge
         entity: sensor.koreader_progress
         name: Progresso
@@ -32,5 +48,6 @@ views:
         hours_to_show: 168
         entities:
           - sensor.koreader_reading_time_today
-          - sensor.koreader_pages_today
+          - sensor.koreader_pages_read_today
           - sensor.koreader_reading_speed
+          - sensor.koreader_total_reading_time
