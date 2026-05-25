@@ -1,0 +1,17 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up KOReader",
+        "description": "Do you want to start the KOReader setup?"
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Already configured.",
+      "webhook_not_internet_accessible": "Your Home Assistant instance must be reachable from the device to receive webhook messages."
+    },
+    "create_entry": {
+      "default": "To send KOReader telemetry to Home Assistant, configure the plugin with the webhook URL:\n\n`{webhook_url}`"
+    }
+  }
+}

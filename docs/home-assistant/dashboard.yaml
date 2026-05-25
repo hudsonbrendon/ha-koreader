@@ -1,0 +1,36 @@
+title: Kindle
+views:
+  - title: Kindle
+    cards:
+      - type: entities
+        title: KOReader
+        entities:
+          - binary_sensor.koreader_reading
+          - sensor.koreader_book_title
+          - sensor.koreader_book_author
+          - sensor.koreader_chapter
+          - sensor.koreader_current_page
+          - sensor.koreader_total_pages
+          - binary_sensor.koreader_charging
+          - switch.koreader_wifi
+          - number.koreader_frontlight
+          - button.koreader_force_sync
+      - type: gauge
+        entity: sensor.koreader_progress
+        name: Progresso
+        unit: "%"
+        min: 0
+        max: 100
+      - type: gauge
+        entity: sensor.koreader_battery
+        name: Bateria
+        unit: "%"
+        min: 0
+        max: 100
+      - type: history-graph
+        title: Leitura
+        hours_to_show: 168
+        entities:
+          - sensor.koreader_reading_time_today
+          - sensor.koreader_pages_today
+          - sensor.koreader_reading_speed
