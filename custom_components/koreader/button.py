@@ -6,7 +6,7 @@ from homeassistant.components.button import ButtonEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import CMD_SYNC_NOW
+from .const import CMD_SYNC_NOW, queue_command
 from .entity import KOReaderEntity
 
 
@@ -31,4 +31,4 @@ class KOReaderSyncButton(KOReaderEntity, ButtonEntity):
         return True
 
     async def async_press(self) -> None:
-        self._entry.runtime_data.commands.append({"type": CMD_SYNC_NOW})
+        queue_command(self._entry.runtime_data, {"type": CMD_SYNC_NOW})

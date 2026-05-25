@@ -6,7 +6,7 @@ from homeassistant.components.number import NumberEntity, NumberMode
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import CMD_SET_FRONTLIGHT
+from .const import CMD_SET_FRONTLIGHT, queue_command
 from .entity import KOReaderEntity
 
 
@@ -42,9 +42,7 @@ class KOReaderFrontlight(KOReaderEntity, NumberEntity):
         return float(value) if value is not None else None
 
     async def async_set_native_value(self, value: float) -> None:
-        self._entry.runtime_data.commands.append(
-            {"type": CMD_SET_FRONTLIGHT, "value": int(value)}
+        queue_command(
+            self._entry.runtime_data,
+            {"type": CMD_SET_FRONTLIGHT, "value": int(value)},
         )
-        # Otimista: reflete já, será confirmado no próximo snapshot.
-        self._entry.runtime_data.data["frontlight"] = int(value)
-        self.async_write_ha_state()

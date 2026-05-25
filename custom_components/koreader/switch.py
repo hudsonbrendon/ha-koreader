@@ -8,7 +8,7 @@ from homeassistant.components.switch import SwitchEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import CMD_SET_WIFI
+from .const import CMD_SET_WIFI, queue_command
 from .entity import KOReaderEntity
 
 
@@ -37,7 +37,7 @@ class KOReaderWifiSwitch(KOReaderEntity, SwitchEntity):
         return bool(self._payload.get("wifi_connected"))
 
     async def async_turn_on(self, **kwargs: Any) -> None:
-        self._entry.runtime_data.commands.append({"type": CMD_SET_WIFI, "value": True})
+        queue_command(self._entry.runtime_data, {"type": CMD_SET_WIFI, "value": True})
 
     async def async_turn_off(self, **kwargs: Any) -> None:
-        self._entry.runtime_data.commands.append({"type": CMD_SET_WIFI, "value": False})
+        queue_command(self._entry.runtime_data, {"type": CMD_SET_WIFI, "value": False})

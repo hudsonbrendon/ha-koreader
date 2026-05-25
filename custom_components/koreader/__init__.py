@@ -23,6 +23,7 @@ from .const import (
     CMD_SHOW_MESSAGE,
     DOMAIN,
     SERVICE_SHOW_MESSAGE,
+    queue_command,
     signal_update,
 )
 
@@ -69,11 +70,10 @@ async def handle_webhook(
         return web.Response(status=HTTPStatus.UNPROCESSABLE_ENTITY)
 
     runtime = entry.runtime_data
-    runtime.data = payload
-    async_dispatcher_send(hass, signal_update(entry.entry_id))
-
     commands = runtime.commands
     runtime.commands = []
+    runtime.data = payload
+    async_dispatcher_send(hass, signal_update(entry.entry_id))
     return web.json_response({"commands": commands})
 
 
@@ -101,6 +101,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: KOReaderConfigEntry) ->
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
 
+# Limpa o webhook registrado quando a config entry é removida.
 async_remove_entry = config_entry_flow.webhook_async_remove_entry
 
 
@@ -116,7 +117,7 @@ def _async_register_services(hass: HomeAssistant) -> None:
             command["timeout"] = call.data[ATTR_TIMEOUT]
         for entry in hass.config_entries.async_entries(DOMAIN):
             if entry.state is ConfigEntryState.LOADED:
-                entry.runtime_data.commands.append(dict(command))
+                queue_command(entry.runtime_data, dict(command))
 
     hass.services.async_register(
         DOMAIN, SERVICE_SHOW_MESSAGE, _show_message, schema=SHOW_MESSAGE_SCHEMA
