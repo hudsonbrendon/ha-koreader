@@ -1,4 +1,59 @@
-"""Stub temporário (substituído na fase de entidades)."""
+"""Binary sensors do KOReader."""
 
-async def async_setup_entry(hass, entry, async_add_entities):
-    return None
+from __future__ import annotations
+
+from collections.abc import Callable
+from dataclasses import dataclass
+from typing import Any
+
+from homeassistant.components.binary_sensor import (
+    BinarySensorDeviceClass,
+    BinarySensorEntity,
+    BinarySensorEntityDescription,
+)
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+
+from .entity import KOReaderEntity
+
+
+@dataclass(frozen=True, kw_only=True)
+class KOReaderBinarySensorEntityDescription(BinarySensorEntityDescription):
+    value_fn: Callable[[dict[str, Any]], bool]
+
+
+BINARY_SENSORS: tuple[KOReaderBinarySensorEntityDescription, ...] = (
+    KOReaderBinarySensorEntityDescription(
+        key="reading",
+        name="Reading",
+        icon="mdi:book-open-variant",
+        value_fn=lambda d: bool(d.get("reading")),
+    ),
+    KOReaderBinarySensorEntityDescription(
+        key="charging",
+        name="Charging",
+        device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
+        value_fn=lambda d: bool(d.get("is_charging")),
+    ),
+)
+
+
+async def async_setup_entry(
+    hass: HomeAssistant, entry, async_add_entities: AddEntitiesCallback
+) -> None:
+    async_add_entities(
+        KOReaderBinarySensor(entry, desc) for desc in BINARY_SENSORS
+    )
+
+
+class KOReaderBinarySensor(KOReaderEntity, BinarySensorEntity):
+    entity_description: KOReaderBinarySensorEntityDescription
+
+    def __init__(self, entry, description: KOReaderBinarySensorEntityDescription) -> None:
+        super().__init__(entry)
+        self.entity_description = description
+        self._attr_unique_id = f"{entry.entry_id}_{description.key}"
+
+    @property
+    def is_on(self) -> bool:
+        return self.entity_description.value_fn(self._payload)
