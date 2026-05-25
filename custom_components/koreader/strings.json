@@ -1,0 +1,17 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configurar KOReader",
+        "description": "Você quer iniciar a configuração do KOReader?"
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Já configurado.",
+      "webhook_not_internet_accessible": "Sua instância do Home Assistant precisa estar acessível pelo dispositivo para receber mensagens de webhook."
+    },
+    "create_entry": {
+      "default": "Para enviar a telemetria do KOReader ao Home Assistant, configure o plugin com a URL de webhook:\n\n`{webhook_url}`"
+    }
+  }
+}
