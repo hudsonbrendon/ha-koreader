@@ -19,9 +19,12 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 
 from .const import (
     ATTR_MESSAGE,
+    ATTR_PAGE,
     ATTR_TIMEOUT,
+    CMD_GOTO_PAGE,
     CMD_SHOW_MESSAGE,
     DOMAIN,
+    SERVICE_GO_TO_PAGE,
     SERVICE_SHOW_MESSAGE,
     queue_command,
     signal_update,
@@ -39,6 +42,12 @@ SHOW_MESSAGE_SCHEMA = vol.Schema(
     {
         vol.Required(ATTR_MESSAGE): cv.string,
         vol.Optional(ATTR_TIMEOUT): vol.All(vol.Coerce(int), vol.Range(min=1, max=120)),
+    }
+)
+
+GO_TO_PAGE_SCHEMA = vol.Schema(
+    {
+        vol.Required(ATTR_PAGE): vol.All(vol.Coerce(int), vol.Range(min=1)),
     }
 )
 
@@ -107,7 +116,7 @@ async_remove_entry = config_entry_flow.webhook_async_remove_entry
 
 @callback
 def _async_register_services(hass: HomeAssistant) -> None:
-    """Registra o serviço koreader.show_message (uma vez)."""
+    """Registra os serviços koreader.show_message e koreader.go_to_page (uma vez)."""
     if hass.services.has_service(DOMAIN, SERVICE_SHOW_MESSAGE):
         return
 
@@ -119,6 +128,17 @@ def _async_register_services(hass: HomeAssistant) -> None:
             if entry.state is ConfigEntryState.LOADED:
                 queue_command(entry.runtime_data, dict(command))
 
+    async def _go_to_page(call: ServiceCall) -> None:
+        page = call.data[ATTR_PAGE]
+        for entry in hass.config_entries.async_entries(DOMAIN):
+            if entry.state is ConfigEntryState.LOADED:
+                queue_command(
+                    entry.runtime_data, {"type": CMD_GOTO_PAGE, "value": page}
+                )
+
     hass.services.async_register(
         DOMAIN, SERVICE_SHOW_MESSAGE, _show_message, schema=SHOW_MESSAGE_SCHEMA
+    )
+    hass.services.async_register(
+        DOMAIN, SERVICE_GO_TO_PAGE, _go_to_page, schema=GO_TO_PAGE_SCHEMA
     )

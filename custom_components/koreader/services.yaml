@@ -19,3 +19,16 @@ show_message:
           min: 1
           max: 120
           unit_of_measurement: s
+
+go_to_page:
+  name: Ir para página
+  description: Enfileira um comando para o KOReader saltar para uma página específica no próximo check-in.
+  fields:
+    page:
+      name: Página
+      description: Número da página de destino (a partir de 1).
+      required: true
+      example: 50
+      selector:
+        number:
+          min: 1

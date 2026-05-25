@@ -14,14 +14,25 @@ CMD_SET_FRONTLIGHT = "set_frontlight"
 CMD_SHOW_MESSAGE = "show_message"
 CMD_SET_WIFI = "set_wifi"
 CMD_SYNC_NOW = "sync_now"
+CMD_SET_WARMTH = "set_warmth"
+CMD_SET_FRONTLIGHT_POWER = "set_frontlight_power"
+CMD_PAGE_TURN = "page_turn"
+CMD_GOTO_PAGE = "goto_page"
+CMD_REFRESH = "refresh"
 
 # Serviço
 SERVICE_SHOW_MESSAGE = "show_message"
 ATTR_MESSAGE = "message"
 ATTR_TIMEOUT = "timeout"
+SERVICE_GO_TO_PAGE = "go_to_page"
+ATTR_PAGE = "page"
 
 # Tipos cujo último valor manda (idempotentes): substituem o anterior do mesmo tipo.
-COALESCE_TYPES = {CMD_SET_FRONTLIGHT, CMD_SET_WIFI, CMD_SYNC_NOW}
+# NÃO inclui page_turn: cada virada de página é um evento discreto.
+COALESCE_TYPES = {
+    CMD_SET_FRONTLIGHT, CMD_SET_WIFI, CMD_SYNC_NOW,
+    CMD_SET_WARMTH, CMD_SET_FRONTLIGHT_POWER, CMD_REFRESH, CMD_GOTO_PAGE,
+}
 # Teto da fila para não crescer sem limite enquanto o Kindle está offline.
 MAX_QUEUED_COMMANDS = 20
 

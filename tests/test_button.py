@@ -29,3 +29,36 @@ async def test_press_enqueues_sync(hass: HomeAssistant):
         blocking=True,
     )
     assert entry.runtime_data.commands == [{"type": "sync_now"}]
+
+
+async def test_next_page_enqueues_command(hass: HomeAssistant):
+    entry = await _setup(hass)
+    await hass.services.async_call(
+        "button",
+        "press",
+        {"entity_id": "button.koreader_next_page"},
+        blocking=True,
+    )
+    assert entry.runtime_data.commands == [{"type": "page_turn", "value": 1}]
+
+
+async def test_prev_page_enqueues_command(hass: HomeAssistant):
+    entry = await _setup(hass)
+    await hass.services.async_call(
+        "button",
+        "press",
+        {"entity_id": "button.koreader_previous_page"},
+        blocking=True,
+    )
+    assert entry.runtime_data.commands == [{"type": "page_turn", "value": -1}]
+
+
+async def test_refresh_enqueues_command(hass: HomeAssistant):
+    entry = await _setup(hass)
+    await hass.services.async_call(
+        "button",
+        "press",
+        {"entity_id": "button.koreader_refresh_screen"},
+        blocking=True,
+    )
+    assert entry.runtime_data.commands == [{"type": "refresh"}]

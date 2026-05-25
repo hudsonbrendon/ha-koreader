@@ -105,6 +105,42 @@ SENSORS: tuple[KOReaderSensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda d: d.get("reading_speed_pph"),
     ),
+    KOReaderSensorEntityDescription(
+        key="pages_left", name="Pages left", icon="mdi:book-arrow-right-outline",
+        state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda d: d.get("pages_left")),
+    KOReaderSensorEntityDescription(
+        key="pages_left_chapter", name="Pages left in chapter",
+        icon="mdi:book-arrow-right-outline", state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda d: d.get("pages_left_chapter")),
+    KOReaderSensorEntityDescription(
+        key="time_to_finish_book", name="Time to finish book",
+        device_class=SensorDeviceClass.DURATION, native_unit_of_measurement=UnitOfTime.MINUTES,
+        state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda d: d.get("time_to_finish_book_min")),
+    KOReaderSensorEntityDescription(
+        key="time_to_finish_chapter", name="Time to finish chapter",
+        device_class=SensorDeviceClass.DURATION, native_unit_of_measurement=UnitOfTime.MINUTES,
+        state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda d: d.get("time_to_finish_chapter_min")),
+    KOReaderSensorEntityDescription(
+        key="book_format", name="Book format", icon="mdi:file-document-outline",
+        value_fn=lambda d: d.get("book_format")),
+    KOReaderSensorEntityDescription(
+        key="book_language", name="Book language", icon="mdi:translate",
+        value_fn=lambda d: d.get("book_language")),
+    KOReaderSensorEntityDescription(
+        key="book_series", name="Book series", icon="mdi:bookshelf",
+        value_fn=lambda d: d.get("book_series")),
+    KOReaderSensorEntityDescription(
+        key="total_time", name="Total reading time",
+        device_class=SensorDeviceClass.DURATION, native_unit_of_measurement=UnitOfTime.MINUTES,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        value_fn=lambda d: d.get("total_time_min")),
+    KOReaderSensorEntityDescription(
+        key="annotations", name="Annotations", icon="mdi:marker",
+        state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda d: d.get("annotations_count")),
 )
 
 

@@ -6,7 +6,11 @@ from homeassistant.setup import async_setup_component
 
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.koreader.const import DOMAIN, SERVICE_SHOW_MESSAGE
+from custom_components.koreader.const import (
+    DOMAIN,
+    SERVICE_GO_TO_PAGE,
+    SERVICE_SHOW_MESSAGE,
+)
 
 WEBHOOK_ID = "koreader_test_id"
 
@@ -32,3 +36,15 @@ async def test_show_message_enqueues(hass: HomeAssistant):
     assert entry.runtime_data.commands == [
         {"type": "show_message", "text": "Hora de dormir", "timeout": 10}
     ]
+
+
+async def test_go_to_page_enqueues(hass: HomeAssistant):
+    entry = await _setup(hass)
+    assert hass.services.has_service(DOMAIN, SERVICE_GO_TO_PAGE)
+    await hass.services.async_call(
+        DOMAIN,
+        SERVICE_GO_TO_PAGE,
+        {"page": 50},
+        blocking=True,
+    )
+    assert entry.runtime_data.commands == [{"type": "goto_page", "value": 50}]

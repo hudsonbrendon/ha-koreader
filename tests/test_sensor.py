@@ -25,6 +25,15 @@ PAYLOAD = {
     "pages_read_today": 40,
     "session_time_min": 12,
     "reading_speed_pph": 68,
+    "pages_left": 282,
+    "pages_left_chapter": 12,
+    "time_to_finish_book_min": 250,
+    "time_to_finish_chapter_min": 11,
+    "book_format": "EPUB",
+    "book_language": "pt-BR",
+    "book_series": "Crônicas de Duna",
+    "total_time_min": 1200,
+    "annotations_count": 7,
     "last_seen": "2026-05-25T12:00:00Z",
 }
 
@@ -51,6 +60,20 @@ async def test_sensors_update_from_webhook(hass: HomeAssistant, hass_client_no_a
     assert hass.states.get("sensor.koreader_chapter").state == "Capítulo 5"
     assert hass.states.get("sensor.koreader_reading_speed").state == "68"
     assert hass.states.get("sensor.koreader_book_title").state == "Duna"
+
+
+async def test_new_sensors_update_from_webhook(hass: HomeAssistant, hass_client_no_auth):
+    await _setup(hass)
+    client = await hass_client_no_auth()
+    resp = await client.post(f"/api/webhook/{WEBHOOK_ID}", json=PAYLOAD)
+    assert resp.status == 200
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.koreader_pages_left").state == "282"
+    assert hass.states.get("sensor.koreader_time_to_finish_book").state == "250"
+    assert hass.states.get("sensor.koreader_book_language").state == "pt-BR"
+    assert hass.states.get("sensor.koreader_total_reading_time").state == "1200"
+    assert hass.states.get("sensor.koreader_annotations").state == "7"
 
 
 async def test_battery_has_device_class(hass: HomeAssistant, hass_client_no_auth):

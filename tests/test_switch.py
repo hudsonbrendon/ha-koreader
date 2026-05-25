@@ -37,3 +37,24 @@ async def test_turn_off_enqueues_command(hass: HomeAssistant):
         blocking=True,
     )
     assert entry.runtime_data.commands == [{"type": "set_wifi", "value": False}]
+
+
+async def test_frontlight_switch_reads_state(hass: HomeAssistant, hass_client_no_auth):
+    await _setup(hass)
+    client = await hass_client_no_auth()
+    await client.post(f"/api/webhook/{WEBHOOK_ID}", json={"frontlight_on": True})
+    await hass.async_block_till_done()
+    assert hass.states.get("switch.koreader_frontlight").state == "on"
+
+
+async def test_frontlight_switch_turn_on_enqueues_command(hass: HomeAssistant):
+    entry = await _setup(hass)
+    await hass.services.async_call(
+        "switch",
+        "turn_on",
+        {"entity_id": "switch.koreader_frontlight"},
+        blocking=True,
+    )
+    assert entry.runtime_data.commands == [
+        {"type": "set_frontlight_power", "value": True}
+    ]

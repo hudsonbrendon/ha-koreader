@@ -37,3 +37,22 @@ async def test_set_frontlight_enqueues_command(hass: HomeAssistant):
         blocking=True,
     )
     assert entry.runtime_data.commands == [{"type": "set_frontlight", "value": 25}]
+
+
+async def test_warmth_reads_value(hass: HomeAssistant, hass_client_no_auth):
+    await _setup(hass)
+    client = await hass_client_no_auth()
+    await client.post(f"/api/webhook/{WEBHOOK_ID}", json={"warmth": 40})
+    await hass.async_block_till_done()
+    assert hass.states.get("number.koreader_warmth").state == "40.0"
+
+
+async def test_set_warmth_enqueues_command(hass: HomeAssistant):
+    entry = await _setup(hass)
+    await hass.services.async_call(
+        "number",
+        "set_value",
+        {"entity_id": "number.koreader_warmth", "value": 60},
+        blocking=True,
+    )
+    assert entry.runtime_data.commands == [{"type": "set_warmth", "value": 60}]
