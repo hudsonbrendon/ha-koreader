@@ -1,7 +1,13 @@
+<p align="center">
+  <img src="logo.png" alt="KOReader" width="360">
+</p>
+
 # KOReader — Integração Home Assistant
 
 Integração nativa que recebe a telemetria do KOReader (Kindle) por **webhook** e
 permite **controlar o Kindle** (luz, mensagem na tela, wifi, sync) pelo Home Assistant.
+
+Traduções: 🇧🇷 Português (`pt` / `pt-BR`) · 🇪🇸 Español (`es`) · 🇬🇧 English (`en`).
 
 ## Instalação (HACS)
 
