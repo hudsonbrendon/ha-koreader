@@ -1,0 +1,21 @@
+show_message:
+  name: Mostrar mensagem
+  description: Enfileira uma mensagem para ser exibida na tela do Kindle no próximo check-in do KOReader.
+  fields:
+    message:
+      name: Mensagem
+      description: Texto a exibir no Kindle.
+      required: true
+      example: "Hora de dormir!"
+      selector:
+        text:
+    timeout:
+      name: Tempo (s)
+      description: Segundos que a mensagem fica na tela (1-120).
+      required: false
+      example: 10
+      selector:
+        number:
+          min: 1
+          max: 120
+          unit_of_measurement: s
