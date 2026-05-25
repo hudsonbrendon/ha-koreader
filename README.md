@@ -1,37 +1,104 @@
 <p align="center">
-  <img src="icon.png" alt="KOReader" width="120"><br>
   <img src="logo.png" alt="KOReader" width="320">
 </p>
 
 # KOReader — Home Assistant Integration
 
-Native integration that receives KOReader (Kindle) telemetry via **webhook** and lets
-you **control the Kindle** (frontlight, on-screen message, wifi, sync) from Home Assistant.
+Native Home Assistant integration for **KOReader** running on a Kindle (or any KOReader
+device). It ingests reading and device **telemetry** and lets you **control the device**
+— frontlight, warmth, wifi, page turns, on-screen messages and more — straight from
+Home Assistant.
 
-Translations: 🇬🇧 English (`en`) · 🇧🇷 Português (`pt` / `pt-BR`) · 🇪🇸 Español (`es`).
+Companion KOReader plugin: **[hatelemetry.koplugin](https://github.com/hudsonbrendon/hatelemetry.koplugin)**
+— sends the telemetry snapshot and applies the commands on the device.
+
+## How it works
+
+On each check-in (page turn, wake-up, or a periodic loop) the plugin sends a snapshot
+to Home Assistant. There are two modes:
+
+- **Webhook (native, recommended)** — this integration receives the snapshot, exposes
+  every entity below, and sends control commands back to the device in the webhook
+  response. Full telemetry **and** control.
+- **REST (legacy)** — the plugin writes sensors directly to Home Assistant's
+  `/api/states` using a long-lived token. Telemetry only; no control from Home Assistant.
+
+> **e-ink note:** commands only reach the device on its next check-in with WiFi on —
+> they are not instant while the screen is off.
 
 ## Installation (HACS)
 
-1. HACS → Integrations → menu (⋮) → **Custom repositories**
+1. HACS → Integrations → ⋮ → **Custom repositories**
 2. Add `https://github.com/hudsonbrendon/ha-koreader` as type **Integration**
 3. Install **KOReader** and restart Home Assistant
 4. Settings → Devices & Services → **Add integration** → **KOReader**
 5. Confirm — Home Assistant shows the **webhook URL**. Copy the id at the end of it.
 
-## Configure the KOReader plugin
+## Plugin setup
 
-In the `ha_config.lua` of the `hatelemetry.koplugin` plugin, set `webhook_id` to the
-copied id, adjust `host`/`port`/`https`, and leave `token = ""`. Reinstall the plugin
-on the Kindle and restart KOReader.
+Install **[hatelemetry.koplugin](https://github.com/hudsonbrendon/hatelemetry.koplugin)**
+on the device (copy the folder into `koreader/plugins/`), then edit its `ha_config.lua`:
 
-## Entities
+- **Webhook mode:** set `webhook_id` to the copied id, set `host` / `port` / `https`, and
+  leave `token = ""`.
+- **REST mode:** leave `webhook_id` empty and set `token` to a Home Assistant long-lived
+  access token.
 
-A **KOReader** device with: battery, reading status, charging, title/author,
-progress %, current/total page, chapter, reading time today, pages today, session
-time, reading speed, frontlight (control), wifi (control), sync button, and the
-`koreader.show_message` service.
+Restart KOReader to load the plugin. Use **Tools → HA Telemetry → Test connection** to verify.
 
-## Limitation (e-ink)
+## Sensors
 
-Commands from Home Assistant only reach the device on KOReader's next check-in (page
-turn, wake-up, or periodic loop) with WiFi on. It is not instant while the screen is off.
+| Entity | Description |
+|---|---|
+| `sensor.koreader_battery` | Battery level (%) |
+| `sensor.koreader_book_title` | Current book title |
+| `sensor.koreader_book_author` | Current book author |
+| `sensor.koreader_book_series` | Book series / collection |
+| `sensor.koreader_book_format` | File format (EPUB, PDF, …) |
+| `sensor.koreader_book_language` | Book language |
+| `sensor.koreader_chapter` | Current chapter |
+| `sensor.koreader_progress` | Reading progress (%) |
+| `sensor.koreader_current_page` | Current page |
+| `sensor.koreader_total_pages` | Total pages |
+| `sensor.koreader_pages_left` | Pages left in the book |
+| `sensor.koreader_pages_left_in_chapter` | Pages left in the current chapter |
+| `sensor.koreader_time_to_finish_book` | Estimated time to finish the book (min) |
+| `sensor.koreader_time_to_finish_chapter` | Estimated time to finish the chapter (min) |
+| `sensor.koreader_reading_speed` | Reading speed (pages/h) |
+| `sensor.koreader_reading_time_today` | Reading time today (min) |
+| `sensor.koreader_pages_read_today` | Pages read today |
+| `sensor.koreader_session_time` | Current session time (min) |
+| `sensor.koreader_total_reading_time` | Lifetime reading time for the book (min) |
+| `sensor.koreader_annotations` | Number of highlights / notes |
+
+## Binary sensors
+
+| Entity | Description |
+|---|---|
+| `binary_sensor.koreader_reading` | Reading / book open |
+| `binary_sensor.koreader_charging` | Device charging |
+
+## Controls
+
+| Entity | Description |
+|---|---|
+| `number.koreader_frontlight` | Frontlight brightness (0–100%) |
+| `number.koreader_warmth` | Frontlight warmth / color temperature |
+| `switch.koreader_frontlight` | Frontlight on / off |
+| `switch.koreader_wifi` | Wi-Fi on / off |
+| `button.koreader_next_page` | Turn to the next page |
+| `button.koreader_previous_page` | Turn to the previous page |
+| `button.koreader_refresh_screen` | Refresh the e-ink screen |
+| `button.koreader_force_sync` | Force a sync / check-in |
+
+## Services
+
+| Service | Description | Fields |
+|---|---|---|
+| `koreader.show_message` | Queue a message to show on the device screen | `message` (required), `timeout` (optional, 1–120 s) |
+| `koreader.go_to_page` | Queue a jump to a specific page | `page` (required, ≥ 1) |
+
+## Dashboard
+
+A ready-to-use Lovelace dashboard is included at
+[`docs/home-assistant/dashboard.yaml`](docs/home-assistant/dashboard.yaml).
