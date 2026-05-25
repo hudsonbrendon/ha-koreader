@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo.png" alt="KOReader" width="320">
+  <img src="https://raw.githubusercontent.com/hudsonbrendon/ha-koreader/main/logo.png" alt="KOReader" width="320">
 </p>
 
 # KOReader — Home Assistant Integration
