@@ -1,7 +1,7 @@
 {
   "domain": "koreader",
   "name": "KOReader",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "codeowners": ["@hudsonbrendon"],
   "config_flow": true,
   "dependencies": ["webhook"],
