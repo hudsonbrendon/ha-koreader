@@ -9,5 +9,5 @@
   "issue_tracker": "https://github.com/hudsonbrendon/ha-koreader/issues",
   "iot_class": "local_push",
   "integration_type": "device",
-  "requirements": []
+  "requirements": ["pykoreader==0.1.0"]
 }
