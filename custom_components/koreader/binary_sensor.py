@@ -6,6 +6,8 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
+from pykoreader import Snapshot
+
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
     BinarySensorEntity,
@@ -19,7 +21,7 @@ from .entity import KOReaderEntity
 
 @dataclass(frozen=True, kw_only=True)
 class KOReaderBinarySensorEntityDescription(BinarySensorEntityDescription):
-    value_fn: Callable[[dict[str, Any]], bool]
+    value_fn: Callable[[Snapshot], bool | None]
 
 
 BINARY_SENSORS: tuple[KOReaderBinarySensorEntityDescription, ...] = (
@@ -27,13 +29,13 @@ BINARY_SENSORS: tuple[KOReaderBinarySensorEntityDescription, ...] = (
         key="reading",
         name="Reading",
         icon="mdi:book-open-variant",
-        value_fn=lambda d: bool(d.get("reading")),
+        value_fn=lambda s: s.reading,
     ),
     KOReaderBinarySensorEntityDescription(
         key="charging",
         name="Charging",
         device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
-        value_fn=lambda d: bool(d.get("is_charging")),
+        value_fn=lambda s: s.is_charging,
     ),
 )
 
@@ -55,5 +57,8 @@ class KOReaderBinarySensor(KOReaderEntity, BinarySensorEntity):
         self._attr_unique_id = f"{entry.entry_id}_{description.key}"
 
     @property
-    def is_on(self) -> bool:
-        return self.entity_description.value_fn(self._payload)
+    def is_on(self) -> bool | None:
+        snapshot = self._snapshot
+        if snapshot is None:
+            return None
+        return self.entity_description.value_fn(snapshot)
