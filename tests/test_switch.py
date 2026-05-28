@@ -58,3 +58,25 @@ async def test_frontlight_switch_turn_on_enqueues_command(hass: HomeAssistant):
     assert entry.runtime_data.queue.pending == [
         {"type": "set_frontlight_power", "value": True}
     ]
+
+
+async def test_dark_mode_turn_on_enqueues_command(hass: HomeAssistant):
+    entry = await _setup(hass)
+    await hass.services.async_call(
+        "switch", "turn_on", {"entity_id": "switch.koreader_dark_mode"}, blocking=True
+    )
+    assert entry.runtime_data.queue.pending == [
+        {"type": "set_dark_mode", "value": True}
+    ]
+    assert hass.states.get("switch.koreader_dark_mode").state == "on"
+
+
+async def test_dark_mode_turn_off_enqueues_command(hass: HomeAssistant):
+    entry = await _setup(hass)
+    await hass.services.async_call(
+        "switch", "turn_off", {"entity_id": "switch.koreader_dark_mode"}, blocking=True
+    )
+    assert entry.runtime_data.queue.pending == [
+        {"type": "set_dark_mode", "value": False}
+    ]
+    assert hass.states.get("switch.koreader_dark_mode").state == "off"

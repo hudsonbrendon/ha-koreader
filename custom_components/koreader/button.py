@@ -20,6 +20,11 @@ async def async_setup_entry(
             KOReaderNextPageButton(entry),
             KOReaderPrevPageButton(entry),
             KOReaderRefreshButton(entry),
+            KOReaderNextChapterButton(entry),
+            KOReaderPrevChapterButton(entry),
+            KOReaderToggleBookmarkButton(entry),
+            KOReaderSuspendButton(entry),
+            KOReaderRestartButton(entry),
         ]
     )
 
@@ -78,3 +83,63 @@ class KOReaderRefreshButton(KOReaderButton):
 
     async def async_press(self) -> None:
         self._entry.runtime_data.queue.add(kcmd.refresh())
+
+
+class KOReaderNextChapterButton(KOReaderButton):
+    _attr_name = "Next chapter"
+    _attr_icon = "mdi:chevron-double-right"
+
+    def __init__(self, entry) -> None:
+        super().__init__(entry)
+        self._attr_unique_id = f"{entry.entry_id}_next_chapter"
+
+    async def async_press(self) -> None:
+        self._entry.runtime_data.queue.add(kcmd.goto_chapter(1))
+
+
+class KOReaderPrevChapterButton(KOReaderButton):
+    _attr_name = "Previous chapter"
+    _attr_icon = "mdi:chevron-double-left"
+
+    def __init__(self, entry) -> None:
+        super().__init__(entry)
+        self._attr_unique_id = f"{entry.entry_id}_prev_chapter"
+
+    async def async_press(self) -> None:
+        self._entry.runtime_data.queue.add(kcmd.goto_chapter(-1))
+
+
+class KOReaderToggleBookmarkButton(KOReaderButton):
+    _attr_name = "Toggle bookmark"
+    _attr_icon = "mdi:bookmark-outline"
+
+    def __init__(self, entry) -> None:
+        super().__init__(entry)
+        self._attr_unique_id = f"{entry.entry_id}_toggle_bookmark"
+
+    async def async_press(self) -> None:
+        self._entry.runtime_data.queue.add(kcmd.toggle_bookmark())
+
+
+class KOReaderSuspendButton(KOReaderButton):
+    _attr_name = "Suspend"
+    _attr_icon = "mdi:sleep"
+
+    def __init__(self, entry) -> None:
+        super().__init__(entry)
+        self._attr_unique_id = f"{entry.entry_id}_suspend"
+
+    async def async_press(self) -> None:
+        self._entry.runtime_data.queue.add(kcmd.suspend())
+
+
+class KOReaderRestartButton(KOReaderButton):
+    _attr_name = "Restart"
+    _attr_icon = "mdi:restart"
+
+    def __init__(self, entry) -> None:
+        super().__init__(entry)
+        self._attr_unique_id = f"{entry.entry_id}_restart"
+
+    async def async_press(self) -> None:
+        self._entry.runtime_data.queue.add(kcmd.restart())

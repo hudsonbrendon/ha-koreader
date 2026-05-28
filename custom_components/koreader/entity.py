@@ -21,14 +21,18 @@ class KOReaderEntity(Entity):
     def __init__(self, entry) -> None:
         self._entry = entry
         model = "KOReader"
+        sw_version = None
         snapshot = entry.runtime_data.snapshot
-        if snapshot is not None and snapshot.device_model:
-            model = snapshot.device_model
+        if snapshot is not None:
+            if snapshot.device_model:
+                model = snapshot.device_model
+            sw_version = snapshot.koreader_version
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
             name="KOReader",
             manufacturer="KOReader",
             model=model,
+            sw_version=sw_version,
         )
 
     @property
@@ -48,7 +52,6 @@ class KOReaderEntity(Entity):
 
     @callback
     def _handle_update(self) -> None:
-        snapshot = self._snapshot
-        if snapshot is not None and snapshot.device_model and self._attr_device_info is not None:
-            self._attr_device_info["model"] = snapshot.device_model
+        # model / sw_version updates land in the device registry from the webhook
+        # handler (_async_update_device); here we only refresh the entity state.
         self.async_write_ha_state()

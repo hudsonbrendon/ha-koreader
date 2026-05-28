@@ -16,7 +16,13 @@ from .entity import KOReaderEntity
 async def async_setup_entry(
     hass: HomeAssistant, entry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    async_add_entities([KOReaderWifiSwitch(entry), KOReaderFrontlightSwitch(entry)])
+    async_add_entities(
+        [
+            KOReaderWifiSwitch(entry),
+            KOReaderFrontlightSwitch(entry),
+            KOReaderDarkModeSwitch(entry),
+        ]
+    )
 
 
 class KOReaderWifiSwitch(KOReaderEntity, SwitchEntity):
@@ -65,3 +71,30 @@ class KOReaderFrontlightSwitch(KOReaderEntity, SwitchEntity):
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         self._entry.runtime_data.queue.add(kcmd.set_frontlight_power(False))
+
+
+class KOReaderDarkModeSwitch(KOReaderEntity, SwitchEntity):
+    """Night mode. The device sends no feedback, so the state is assumed."""
+
+    _attr_name = "Dark mode"
+    _attr_icon = "mdi:theme-light-dark"
+    _attr_assumed_state = True
+
+    def __init__(self, entry) -> None:
+        super().__init__(entry)
+        self._attr_unique_id = f"{entry.entry_id}_dark_mode"
+        self._attr_is_on = False
+
+    @property
+    def available(self) -> bool:
+        return True
+
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        self._entry.runtime_data.queue.add(kcmd.set_dark_mode(True))
+        self._attr_is_on = True
+        self.async_write_ha_state()
+
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        self._entry.runtime_data.queue.add(kcmd.set_dark_mode(False))
+        self._attr_is_on = False
+        self.async_write_ha_state()
