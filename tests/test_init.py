@@ -51,6 +51,15 @@ async def test_webhook_rejects_non_object(
     assert resp.status == 422
 
 
+async def test_webhook_rejects_invalid_json(
+    hass: HomeAssistant, hass_client_no_auth
+) -> None:
+    await _setup_entry(hass)
+    client = await hass_client_no_auth()
+    resp = await client.post(f"/api/webhook/{WEBHOOK_ID}", data=b"not json")
+    assert resp.status == 400
+
+
 async def test_unload_unregisters_webhook(hass: HomeAssistant) -> None:
     entry = await _setup_entry(hass)
     assert await hass.config_entries.async_unload(entry.entry_id)

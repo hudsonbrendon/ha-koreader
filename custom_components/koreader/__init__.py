@@ -119,10 +119,11 @@ def _async_register_services(hass: HomeAssistant) -> None:
         return
 
     async def _show_message(call: ServiceCall) -> None:
-        command = kcmd.show_message(call.data[ATTR_MESSAGE], call.data.get(ATTR_TIMEOUT))
         for entry in hass.config_entries.async_entries(DOMAIN):
             if entry.state is ConfigEntryState.LOADED:
-                entry.runtime_data.queue.add(dict(command))
+                entry.runtime_data.queue.add(
+                    kcmd.show_message(call.data[ATTR_MESSAGE], call.data.get(ATTR_TIMEOUT))
+                )
 
     async def _go_to_page(call: ServiceCall) -> None:
         page = call.data[ATTR_PAGE]
