@@ -20,6 +20,8 @@ views:
           - sensor.koreader_time_to_finish_chapter
           - sensor.koreader_estimated_finish_date
           - sensor.koreader_annotations
+          - sensor.koreader_highlights
+          - sensor.koreader_notes
       - type: entities
         title: Controle
         entities:
@@ -28,12 +30,18 @@ views:
           - binary_sensor.koreader_charging
           - switch.koreader_wifi
           - switch.koreader_frontlight
+          - switch.koreader_dark_mode
           - number.koreader_frontlight
           - number.koreader_warmth
           - button.koreader_force_sync
           - button.koreader_next_page
           - button.koreader_previous_page
+          - button.koreader_next_chapter
+          - button.koreader_previous_chapter
+          - button.koreader_toggle_bookmark
           - button.koreader_refresh_screen
+          - button.koreader_suspend
+          - button.koreader_restart
       - type: gauge
         entity: sensor.koreader_progress
         name: Progresso

@@ -109,9 +109,30 @@ async def handle_webhook(
     previous = runtime.snapshot
     runtime.snapshot = snapshot
     runtime.last_update = dt_util.utcnow()
+    _async_update_device(hass, entry, snapshot)
     _fire_transition_events(hass, entry, previous, snapshot)
     async_dispatcher_send(hass, signal_update(entry.entry_id))
     return web.json_response({"commands": pending})
+
+
+@callback
+def _async_update_device(
+    hass: HomeAssistant, entry: KOReaderConfigEntry, snapshot: Snapshot
+) -> None:
+    """Reflete model/sw_version do snapshot no device registry (mudanças vêm depois do setup)."""
+    if not (snapshot.device_model or snapshot.koreader_version):
+        return
+    registry = dr.async_get(hass)
+    device = registry.async_get_device(identifiers={(DOMAIN, entry.entry_id)})
+    if device is None:
+        return
+    kwargs: dict[str, str] = {}
+    if snapshot.device_model and device.model != snapshot.device_model:
+        kwargs["model"] = snapshot.device_model
+    if snapshot.koreader_version and device.sw_version != snapshot.koreader_version:
+        kwargs["sw_version"] = snapshot.koreader_version
+    if kwargs:
+        registry.async_update_device(device.id, **kwargs)
 
 
 @callback

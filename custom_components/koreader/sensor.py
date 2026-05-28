@@ -100,6 +100,12 @@ SENSORS: tuple[KOReaderSensorEntityDescription, ...] = (
     KOReaderSensorEntityDescription(
         key="annotations", name="Annotations", icon="mdi:marker",
         state_class=SensorStateClass.MEASUREMENT, value_fn=lambda s: s.annotations_count),
+    KOReaderSensorEntityDescription(
+        key="highlights", name="Highlights", icon="mdi:marker",
+        state_class=SensorStateClass.MEASUREMENT, value_fn=lambda s: s.highlights_count),
+    KOReaderSensorEntityDescription(
+        key="notes", name="Notes", icon="mdi:note-edit-outline",
+        state_class=SensorStateClass.MEASUREMENT, value_fn=lambda s: s.notes_count),
 )
 
 

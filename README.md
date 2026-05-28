@@ -69,7 +69,9 @@ Restart KOReader to load the plugin. Use **Tools → HA Telemetry → Test conne
 | `sensor.koreader_pages_read_today` | Pages read today |
 | `sensor.koreader_session_time` | Current session time (min) |
 | `sensor.koreader_total_reading_time` | Lifetime reading time for the book (min) |
-| `sensor.koreader_annotations` | Number of highlights / notes |
+| `sensor.koreader_annotations` | Number of highlights / notes (combined) |
+| `sensor.koreader_highlights` | Highlights only |
+| `sensor.koreader_notes` | Notes only |
 | `sensor.koreader_last_check_in` | Timestamp of the last telemetry check-in (HA clock) |
 | `sensor.koreader_estimated_finish_date` | Projected finish date/time at the current pace |
 
@@ -89,9 +91,15 @@ Restart KOReader to load the plugin. Use **Tools → HA Telemetry → Test conne
 | `number.koreader_warmth` | Frontlight warmth / color temperature |
 | `switch.koreader_frontlight` | Frontlight on / off |
 | `switch.koreader_wifi` | Wi-Fi on / off |
+| `switch.koreader_dark_mode` | Night mode on / off (assumed state) |
 | `button.koreader_next_page` | Turn to the next page |
 | `button.koreader_previous_page` | Turn to the previous page |
+| `button.koreader_next_chapter` | Jump to the next chapter |
+| `button.koreader_previous_chapter` | Jump to the previous chapter |
+| `button.koreader_toggle_bookmark` | Bookmark the current page |
 | `button.koreader_refresh_screen` | Refresh the e-ink screen |
+| `button.koreader_suspend` | Put the device to sleep |
+| `button.koreader_restart` | Restart KOReader |
 | `button.koreader_force_sync` | Force a sync / check-in |
 | `notify.koreader_notify` | Notify target — push text to the device screen via `notify.send_message` |
 

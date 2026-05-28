@@ -34,6 +34,9 @@ PAYLOAD = {
     "book_series": "Crônicas de Duna",
     "total_time_min": 1200,
     "annotations_count": 7,
+    "highlights_count": 5,
+    "notes_count": 2,
+    "koreader_version": "v2024.04",
     "last_seen": "2026-05-25T12:00:00Z",
 }
 
@@ -74,6 +77,25 @@ async def test_new_sensors_update_from_webhook(hass: HomeAssistant, hass_client_
     assert hass.states.get("sensor.koreader_book_language").state == "pt-BR"
     assert hass.states.get("sensor.koreader_total_reading_time").state == "1200"
     assert hass.states.get("sensor.koreader_annotations").state == "7"
+    assert hass.states.get("sensor.koreader_highlights").state == "5"
+    assert hass.states.get("sensor.koreader_notes").state == "2"
+
+
+async def test_device_sw_version_from_koreader_version(
+    hass: HomeAssistant, hass_client_no_auth
+):
+    from homeassistant.helpers import device_registry as dr
+
+    entry = await _setup(hass)
+    client = await hass_client_no_auth()
+    await client.post(f"/api/webhook/{WEBHOOK_ID}", json=PAYLOAD)
+    await hass.async_block_till_done()
+
+    device = dr.async_get(hass).async_get_device(
+        identifiers={(DOMAIN, entry.entry_id)}
+    )
+    assert device is not None
+    assert device.sw_version == "v2024.04"
 
 
 async def test_battery_has_device_class(hass: HomeAssistant, hass_client_no_auth):

@@ -62,3 +62,49 @@ async def test_refresh_enqueues_command(hass: HomeAssistant):
         blocking=True,
     )
     assert entry.runtime_data.queue.pending == [{"type": "refresh"}]
+
+
+async def test_next_chapter_enqueues_command(hass: HomeAssistant):
+    entry = await _setup(hass)
+    await hass.services.async_call(
+        "button", "press", {"entity_id": "button.koreader_next_chapter"}, blocking=True
+    )
+    assert entry.runtime_data.queue.pending == [{"type": "goto_chapter", "value": 1}]
+
+
+async def test_prev_chapter_enqueues_command(hass: HomeAssistant):
+    entry = await _setup(hass)
+    await hass.services.async_call(
+        "button",
+        "press",
+        {"entity_id": "button.koreader_previous_chapter"},
+        blocking=True,
+    )
+    assert entry.runtime_data.queue.pending == [{"type": "goto_chapter", "value": -1}]
+
+
+async def test_toggle_bookmark_enqueues_command(hass: HomeAssistant):
+    entry = await _setup(hass)
+    await hass.services.async_call(
+        "button",
+        "press",
+        {"entity_id": "button.koreader_toggle_bookmark"},
+        blocking=True,
+    )
+    assert entry.runtime_data.queue.pending == [{"type": "toggle_bookmark"}]
+
+
+async def test_suspend_enqueues_command(hass: HomeAssistant):
+    entry = await _setup(hass)
+    await hass.services.async_call(
+        "button", "press", {"entity_id": "button.koreader_suspend"}, blocking=True
+    )
+    assert entry.runtime_data.queue.pending == [{"type": "suspend"}]
+
+
+async def test_restart_enqueues_command(hass: HomeAssistant):
+    entry = await _setup(hass)
+    await hass.services.async_call(
+        "button", "press", {"entity_id": "button.koreader_restart"}, blocking=True
+    )
+    assert entry.runtime_data.queue.pending == [{"type": "restart"}]

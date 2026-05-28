@@ -1,7 +1,7 @@
 {
   "domain": "koreader",
   "name": "KOReader",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "codeowners": ["@hudsonbrendon"],
   "config_flow": true,
   "dependencies": ["webhook"],
@@ -9,5 +9,5 @@
   "issue_tracker": "https://github.com/hudsonbrendon/ha-koreader/issues",
   "iot_class": "local_push",
   "integration_type": "device",
-  "requirements": ["pykoreader==0.1.0"]
+  "requirements": ["pykoreader==0.2.0"]
 }
