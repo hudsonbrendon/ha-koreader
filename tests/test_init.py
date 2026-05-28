@@ -27,7 +27,7 @@ async def test_webhook_stores_payload_and_returns_commands(
     entry = await _setup_entry(hass)
 
     # Enfileira um comando manualmente para checar a resposta
-    entry.runtime_data.commands.append({"type": "show_message", "text": "oi"})
+    entry.runtime_data.queue.add({"type": "show_message", "text": "oi"})
 
     client = await hass_client_no_auth()
     resp = await client.post(
@@ -38,8 +38,8 @@ async def test_webhook_stores_payload_and_returns_commands(
     assert body["commands"] == [{"type": "show_message", "text": "oi"}]
 
     # Snapshot guardado e fila drenada
-    assert entry.runtime_data.data["battery_level"] == 80
-    assert entry.runtime_data.commands == []
+    assert entry.runtime_data.snapshot.battery_level == 80
+    assert entry.runtime_data.queue.pending == []
 
 
 async def test_webhook_rejects_non_object(

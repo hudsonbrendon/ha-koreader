@@ -33,7 +33,7 @@ async def test_show_message_enqueues(hass: HomeAssistant):
         {"message": "Hora de dormir", "timeout": 10},
         blocking=True,
     )
-    assert entry.runtime_data.commands == [
+    assert entry.runtime_data.queue.pending == [
         {"type": "show_message", "text": "Hora de dormir", "timeout": 10}
     ]
 
@@ -47,4 +47,4 @@ async def test_go_to_page_enqueues(hass: HomeAssistant):
         {"page": 50},
         blocking=True,
     )
-    assert entry.runtime_data.commands == [{"type": "goto_page", "value": 50}]
+    assert entry.runtime_data.queue.pending == [{"type": "goto_page", "value": 50}]

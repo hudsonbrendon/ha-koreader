@@ -36,7 +36,7 @@ async def test_turn_off_enqueues_command(hass: HomeAssistant):
         {"entity_id": "switch.koreader_wifi"},
         blocking=True,
     )
-    assert entry.runtime_data.commands == [{"type": "set_wifi", "value": False}]
+    assert entry.runtime_data.queue.pending == [{"type": "set_wifi", "value": False}]
 
 
 async def test_frontlight_switch_reads_state(hass: HomeAssistant, hass_client_no_auth):
@@ -55,6 +55,6 @@ async def test_frontlight_switch_turn_on_enqueues_command(hass: HomeAssistant):
         {"entity_id": "switch.koreader_frontlight"},
         blocking=True,
     )
-    assert entry.runtime_data.commands == [
+    assert entry.runtime_data.queue.pending == [
         {"type": "set_frontlight_power", "value": True}
     ]

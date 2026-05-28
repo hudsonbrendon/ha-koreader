@@ -28,7 +28,7 @@ async def test_press_enqueues_sync(hass: HomeAssistant):
         {"entity_id": "button.koreader_force_sync"},
         blocking=True,
     )
-    assert entry.runtime_data.commands == [{"type": "sync_now"}]
+    assert entry.runtime_data.queue.pending == [{"type": "sync_now"}]
 
 
 async def test_next_page_enqueues_command(hass: HomeAssistant):
@@ -39,7 +39,7 @@ async def test_next_page_enqueues_command(hass: HomeAssistant):
         {"entity_id": "button.koreader_next_page"},
         blocking=True,
     )
-    assert entry.runtime_data.commands == [{"type": "page_turn", "value": 1}]
+    assert entry.runtime_data.queue.pending == [{"type": "page_turn", "value": 1}]
 
 
 async def test_prev_page_enqueues_command(hass: HomeAssistant):
@@ -50,7 +50,7 @@ async def test_prev_page_enqueues_command(hass: HomeAssistant):
         {"entity_id": "button.koreader_previous_page"},
         blocking=True,
     )
-    assert entry.runtime_data.commands == [{"type": "page_turn", "value": -1}]
+    assert entry.runtime_data.queue.pending == [{"type": "page_turn", "value": -1}]
 
 
 async def test_refresh_enqueues_command(hass: HomeAssistant):
@@ -61,4 +61,4 @@ async def test_refresh_enqueues_command(hass: HomeAssistant):
         {"entity_id": "button.koreader_refresh_screen"},
         blocking=True,
     )
-    assert entry.runtime_data.commands == [{"type": "refresh"}]
+    assert entry.runtime_data.queue.pending == [{"type": "refresh"}]
