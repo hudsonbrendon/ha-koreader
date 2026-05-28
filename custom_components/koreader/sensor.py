@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from typing import Any
 
 from pykoreader import Snapshot
@@ -17,6 +18,7 @@ from homeassistant.components.sensor import (
 from homeassistant.const import PERCENTAGE, UnitOfTime
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.util import dt as dt_util
 
 from .entity import KOReaderEntity
 
@@ -104,7 +106,10 @@ SENSORS: tuple[KOReaderSensorEntityDescription, ...] = (
 async def async_setup_entry(
     hass: HomeAssistant, entry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    async_add_entities(KOReaderSensor(entry, desc) for desc in SENSORS)
+    entities: list[SensorEntity] = [KOReaderSensor(entry, desc) for desc in SENSORS]
+    entities.append(KOReaderLastCheckin(entry))
+    entities.append(KOReaderFinishDate(entry))
+    async_add_entities(entities)
 
 
 class KOReaderSensor(KOReaderEntity, SensorEntity):
@@ -123,3 +128,38 @@ class KOReaderSensor(KOReaderEntity, SensorEntity):
         if snapshot is None:
             return None
         return self.entity_description.value_fn(snapshot)
+
+
+class KOReaderLastCheckin(KOReaderEntity, SensorEntity):
+    """Quando o KOReader enviou telemetria pela última vez (relógio do HA)."""
+
+    _attr_name = "Last check-in"
+    _attr_icon = "mdi:clock-check-outline"
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
+
+    def __init__(self, entry) -> None:
+        super().__init__(entry)
+        self._attr_unique_id = f"{entry.entry_id}_last_checkin"
+
+    @property
+    def native_value(self) -> datetime | None:
+        return self._entry.runtime_data.last_update
+
+
+class KOReaderFinishDate(KOReaderEntity, SensorEntity):
+    """Data estimada de término do livro no ritmo atual de leitura."""
+
+    _attr_name = "Estimated finish date"
+    _attr_icon = "mdi:book-clock"
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
+
+    def __init__(self, entry) -> None:
+        super().__init__(entry)
+        self._attr_unique_id = f"{entry.entry_id}_finish_date"
+
+    @property
+    def native_value(self) -> datetime | None:
+        snapshot = self._snapshot
+        if snapshot is None or snapshot.time_to_finish_book_min is None:
+            return None
+        return dt_util.utcnow() + timedelta(minutes=snapshot.time_to_finish_book_min)

@@ -6,9 +6,14 @@ from homeassistant.setup import async_setup_component
 
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
+import pytest
+
+from homeassistant.exceptions import ServiceValidationError
+
 from custom_components.koreader.const import (
     DOMAIN,
     SERVICE_GO_TO_PAGE,
+    SERVICE_GO_TO_PERCENTAGE,
     SERVICE_SHOW_MESSAGE,
 )
 
@@ -48,3 +53,34 @@ async def test_go_to_page_enqueues(hass: HomeAssistant):
         blocking=True,
     )
     assert entry.runtime_data.queue.pending == [{"type": "goto_page", "value": 50}]
+
+
+async def test_go_to_percentage_enqueues_computed_page(
+    hass: HomeAssistant, hass_client_no_auth
+):
+    entry = await _setup(hass)
+    # Precisa de total_pages do snapshot para converter percentagem em página.
+    client = await hass_client_no_auth()
+    await client.post(f"/api/webhook/{WEBHOOK_ID}", json={"total_pages": 412})
+    await hass.async_block_till_done()
+
+    assert hass.services.has_service(DOMAIN, SERVICE_GO_TO_PERCENTAGE)
+    await hass.services.async_call(
+        DOMAIN,
+        SERVICE_GO_TO_PERCENTAGE,
+        {"percent": 50},
+        blocking=True,
+    )
+    # round(0.5 * 412) = 206
+    assert entry.runtime_data.queue.pending == [{"type": "goto_page", "value": 206}]
+
+
+async def test_go_to_percentage_without_total_pages_raises(hass: HomeAssistant):
+    await _setup(hass)
+    with pytest.raises(ServiceValidationError):
+        await hass.services.async_call(
+            DOMAIN,
+            SERVICE_GO_TO_PERCENTAGE,
+            {"percent": 50},
+            blocking=True,
+        )

@@ -70,6 +70,8 @@ Restart KOReader to load the plugin. Use **Tools → HA Telemetry → Test conne
 | `sensor.koreader_session_time` | Current session time (min) |
 | `sensor.koreader_total_reading_time` | Lifetime reading time for the book (min) |
 | `sensor.koreader_annotations` | Number of highlights / notes |
+| `sensor.koreader_last_check_in` | Timestamp of the last telemetry check-in (HA clock) |
+| `sensor.koreader_estimated_finish_date` | Projected finish date/time at the current pace |
 
 ## Binary sensors
 
@@ -77,6 +79,7 @@ Restart KOReader to load the plugin. Use **Tools → HA Telemetry → Test conne
 |---|---|
 | `binary_sensor.koreader_reading` | Reading / book open |
 | `binary_sensor.koreader_charging` | Device charging |
+| `binary_sensor.koreader_status` | Connectivity — `on` while a check-in arrived within the last 15 min |
 
 ## Controls
 
@@ -90,6 +93,7 @@ Restart KOReader to load the plugin. Use **Tools → HA Telemetry → Test conne
 | `button.koreader_previous_page` | Turn to the previous page |
 | `button.koreader_refresh_screen` | Refresh the e-ink screen |
 | `button.koreader_force_sync` | Force a sync / check-in |
+| `notify.koreader_notify` | Notify target — push text to the device screen via `notify.send_message` |
 
 ## Services
 
@@ -97,6 +101,26 @@ Restart KOReader to load the plugin. Use **Tools → HA Telemetry → Test conne
 |---|---|---|
 | `koreader.show_message` | Queue a message to show on the device screen | `message` (required), `timeout` (optional, 1–120 s) |
 | `koreader.go_to_page` | Queue a jump to a specific page | `page` (required, ≥ 1) |
+| `koreader.go_to_percentage` | Queue a jump to a percentage of the book (needs known total pages) | `percent` (required, 0–100) |
+
+## Events & device triggers
+
+On telemetry transitions the integration fires a `koreader_event` bus event (also
+surfaced as **device triggers** in the automation UI), carrying `type`, `device_id`
+and `entry_id`:
+
+| Type | Fires when |
+|---|---|
+| `session_started` | The device starts reading |
+| `session_ended` | The device stops reading |
+| `book_finished` | Progress reaches 100% |
+| `book_changed` | The open book title changes |
+| `highlight_added` | The annotation count increases |
+
+## Diagnostics
+
+Download diagnostics from the device page (⋮ → **Download diagnostics**) to get the
+last snapshot, last check-in time, and any pending commands.
 
 ## Architecture
 

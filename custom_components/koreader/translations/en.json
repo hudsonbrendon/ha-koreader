@@ -13,5 +13,14 @@
     "create_entry": {
       "default": "To send KOReader telemetry to Home Assistant, configure the plugin with the webhook URL:\n\n`{webhook_url}`"
     }
+  },
+  "device_automation": {
+    "trigger_type": {
+      "session_started": "Reading session started",
+      "session_ended": "Reading session ended",
+      "book_finished": "Book finished",
+      "book_changed": "Book changed",
+      "highlight_added": "Highlight added"
+    }
   }
 }
