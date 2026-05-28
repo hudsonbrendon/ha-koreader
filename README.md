@@ -98,6 +98,17 @@ Restart KOReader to load the plugin. Use **Tools → HA Telemetry → Test conne
 | `koreader.show_message` | Queue a message to show on the device screen | `message` (required), `timeout` (optional, 1–120 s) |
 | `koreader.go_to_page` | Queue a jump to a specific page | `page` (required, ≥ 1) |
 
+## Architecture
+
+The KOReader protocol logic — telemetry snapshot model, command builders, and the
+coalescing command queue — lives in a standalone, Home-Assistant-agnostic Python
+package: **[pykoreader](https://github.com/hudsonbrendon/pykoreader)** ([PyPI](https://pypi.org/project/pykoreader/)).
+This integration depends on it (declared in `manifest.json` `requirements`, installed
+automatically by Home Assistant) and only contains the Home Assistant glue: entities,
+config flow, the webhook endpoint, services, and the dashboard. Parsing a webhook body
+into a typed `Snapshot` and building/queuing device commands are all handled by
+`pykoreader`.
+
 ## Dashboard
 
 A ready-to-use Lovelace dashboard is included at
