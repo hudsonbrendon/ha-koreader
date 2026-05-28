@@ -5,10 +5,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from functools import partial
 from http import HTTPStatus
-from typing import Any
 
 import voluptuous as vol
 from aiohttp import web
+from pykoreader import CommandQueue, Snapshot, commands as kcmd, parse_payload
 
 from homeassistant.components import webhook
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
@@ -21,12 +21,9 @@ from .const import (
     ATTR_MESSAGE,
     ATTR_PAGE,
     ATTR_TIMEOUT,
-    CMD_GOTO_PAGE,
-    CMD_SHOW_MESSAGE,
     DOMAIN,
     SERVICE_GO_TO_PAGE,
     SERVICE_SHOW_MESSAGE,
-    queue_command,
     signal_update,
 )
 
@@ -56,8 +53,8 @@ GO_TO_PAGE_SCHEMA = vol.Schema(
 class KOReaderRuntimeData:
     """Estado em memória de uma config entry."""
 
-    data: dict[str, Any] = field(default_factory=dict)
-    commands: list[dict[str, Any]] = field(default_factory=list)
+    snapshot: Snapshot | None = None
+    queue: CommandQueue = field(default_factory=CommandQueue)
 
 
 type KOReaderConfigEntry = ConfigEntry[KOReaderRuntimeData]
@@ -75,15 +72,16 @@ async def handle_webhook(
     except ValueError:
         return web.Response(status=HTTPStatus.BAD_REQUEST)
 
-    if not isinstance(payload, dict):
+    try:
+        snapshot = parse_payload(payload)
+    except ValueError:
         return web.Response(status=HTTPStatus.UNPROCESSABLE_ENTITY)
 
     runtime = entry.runtime_data
-    commands = runtime.commands
-    runtime.commands = []
-    runtime.data = payload
+    pending = runtime.queue.drain()
+    runtime.snapshot = snapshot
     async_dispatcher_send(hass, signal_update(entry.entry_id))
-    return web.json_response({"commands": commands})
+    return web.json_response({"commands": pending})
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: KOReaderConfigEntry) -> bool:
@@ -121,20 +119,16 @@ def _async_register_services(hass: HomeAssistant) -> None:
         return
 
     async def _show_message(call: ServiceCall) -> None:
-        command: dict[str, Any] = {"type": CMD_SHOW_MESSAGE, "text": call.data[ATTR_MESSAGE]}
-        if ATTR_TIMEOUT in call.data:
-            command["timeout"] = call.data[ATTR_TIMEOUT]
+        command = kcmd.show_message(call.data[ATTR_MESSAGE], call.data.get(ATTR_TIMEOUT))
         for entry in hass.config_entries.async_entries(DOMAIN):
             if entry.state is ConfigEntryState.LOADED:
-                queue_command(entry.runtime_data, dict(command))
+                entry.runtime_data.queue.add(dict(command))
 
     async def _go_to_page(call: ServiceCall) -> None:
         page = call.data[ATTR_PAGE]
         for entry in hass.config_entries.async_entries(DOMAIN):
             if entry.state is ConfigEntryState.LOADED:
-                queue_command(
-                    entry.runtime_data, {"type": CMD_GOTO_PAGE, "value": page}
-                )
+                entry.runtime_data.queue.add(kcmd.goto_page(page))
 
     hass.services.async_register(
         DOMAIN, SERVICE_SHOW_MESSAGE, _show_message, schema=SHOW_MESSAGE_SCHEMA
