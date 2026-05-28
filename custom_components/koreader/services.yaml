@@ -32,3 +32,18 @@ go_to_page:
       selector:
         number:
           min: 1
+
+go_to_percentage:
+  name: Ir para percentagem
+  description: Enfileira um salto para uma percentagem do livro (convertida em página a partir do total conhecido).
+  fields:
+    percent:
+      name: Percentagem
+      description: Posição alvo no livro, de 0 a 100.
+      required: true
+      example: 50
+      selector:
+        number:
+          min: 0
+          max: 100
+          unit_of_measurement: "%"

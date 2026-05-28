@@ -18,10 +18,13 @@ views:
           - sensor.koreader_pages_left_in_chapter
           - sensor.koreader_time_to_finish_book
           - sensor.koreader_time_to_finish_chapter
+          - sensor.koreader_estimated_finish_date
           - sensor.koreader_annotations
       - type: entities
         title: Controle
         entities:
+          - binary_sensor.koreader_status
+          - sensor.koreader_last_check_in
           - binary_sensor.koreader_charging
           - switch.koreader_wifi
           - switch.koreader_frontlight
