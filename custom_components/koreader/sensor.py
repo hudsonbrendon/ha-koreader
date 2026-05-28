@@ -6,6 +6,8 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
+from pykoreader import Snapshot
+
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
@@ -23,124 +25,79 @@ from .entity import KOReaderEntity
 class KOReaderSensorEntityDescription(SensorEntityDescription):
     """Descrição de um sensor, com função que extrai o valor do snapshot."""
 
-    value_fn: Callable[[dict[str, Any]], Any]
+    value_fn: Callable[[Snapshot], Any]
 
 
 SENSORS: tuple[KOReaderSensorEntityDescription, ...] = (
     KOReaderSensorEntityDescription(
-        key="battery",
-        name="Battery",
-        device_class=SensorDeviceClass.BATTERY,
-        native_unit_of_measurement=PERCENTAGE,
-        state_class=SensorStateClass.MEASUREMENT,
-        value_fn=lambda d: d.get("battery_level"),
-    ),
+        key="battery", name="Battery", device_class=SensorDeviceClass.BATTERY,
+        native_unit_of_measurement=PERCENTAGE, state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda s: s.battery_level),
     KOReaderSensorEntityDescription(
-        key="book_title",
-        name="Book title",
-        icon="mdi:book",
-        value_fn=lambda d: d.get("book_title"),
-    ),
+        key="book_title", name="Book title", icon="mdi:book",
+        value_fn=lambda s: s.book_title),
     KOReaderSensorEntityDescription(
-        key="book_author",
-        name="Book author",
-        icon="mdi:account-edit",
-        value_fn=lambda d: d.get("book_author"),
-    ),
+        key="book_author", name="Book author", icon="mdi:account-edit",
+        value_fn=lambda s: s.book_author),
     KOReaderSensorEntityDescription(
-        key="progress",
-        name="Progress",
-        icon="mdi:percent",
-        native_unit_of_measurement=PERCENTAGE,
-        state_class=SensorStateClass.MEASUREMENT,
-        value_fn=lambda d: d.get("progress_percent"),
-    ),
+        key="progress", name="Progress", icon="mdi:percent",
+        native_unit_of_measurement=PERCENTAGE, state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda s: s.progress_percent),
     KOReaderSensorEntityDescription(
-        key="current_page",
-        name="Current page",
-        icon="mdi:book-open-page-variant",
-        state_class=SensorStateClass.MEASUREMENT,
-        value_fn=lambda d: d.get("current_page"),
-    ),
+        key="current_page", name="Current page", icon="mdi:book-open-page-variant",
+        state_class=SensorStateClass.MEASUREMENT, value_fn=lambda s: s.current_page),
     KOReaderSensorEntityDescription(
-        key="total_pages",
-        name="Total pages",
-        icon="mdi:book-open-page-variant",
-        value_fn=lambda d: d.get("total_pages"),
-    ),
+        key="total_pages", name="Total pages", icon="mdi:book-open-page-variant",
+        value_fn=lambda s: s.total_pages),
     KOReaderSensorEntityDescription(
-        key="chapter",
-        name="Chapter",
-        icon="mdi:format-list-bulleted",
-        value_fn=lambda d: d.get("chapter"),
-    ),
+        key="chapter", name="Chapter", icon="mdi:format-list-bulleted",
+        value_fn=lambda s: s.chapter),
     KOReaderSensorEntityDescription(
-        key="reading_time_today",
-        name="Reading time today",
-        device_class=SensorDeviceClass.DURATION,
-        native_unit_of_measurement=UnitOfTime.MINUTES,
-        state_class=SensorStateClass.TOTAL_INCREASING,
-        value_fn=lambda d: d.get("reading_time_today_min"),
-    ),
+        key="reading_time_today", name="Reading time today",
+        device_class=SensorDeviceClass.DURATION, native_unit_of_measurement=UnitOfTime.MINUTES,
+        state_class=SensorStateClass.TOTAL_INCREASING, value_fn=lambda s: s.reading_time_today_min),
     KOReaderSensorEntityDescription(
-        key="pages_today",
-        name="Pages read today",
-        icon="mdi:counter",
-        state_class=SensorStateClass.TOTAL_INCREASING,
-        value_fn=lambda d: d.get("pages_read_today"),
-    ),
+        key="pages_today", name="Pages read today", icon="mdi:counter",
+        state_class=SensorStateClass.TOTAL_INCREASING, value_fn=lambda s: s.pages_read_today),
     KOReaderSensorEntityDescription(
-        key="session_time",
-        name="Session time",
-        device_class=SensorDeviceClass.DURATION,
-        native_unit_of_measurement=UnitOfTime.MINUTES,
-        state_class=SensorStateClass.MEASUREMENT,
-        value_fn=lambda d: d.get("session_time_min"),
-    ),
+        key="session_time", name="Session time", device_class=SensorDeviceClass.DURATION,
+        native_unit_of_measurement=UnitOfTime.MINUTES, state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda s: s.session_time_min),
     KOReaderSensorEntityDescription(
-        key="reading_speed",
-        name="Reading speed",
-        icon="mdi:speedometer",
-        native_unit_of_measurement="pages/h",
-        state_class=SensorStateClass.MEASUREMENT,
-        value_fn=lambda d: d.get("reading_speed_pph"),
-    ),
+        key="reading_speed", name="Reading speed", icon="mdi:speedometer",
+        native_unit_of_measurement="pages/h", state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda s: s.reading_speed_pph),
     KOReaderSensorEntityDescription(
         key="pages_left", name="Pages left", icon="mdi:book-arrow-right-outline",
-        state_class=SensorStateClass.MEASUREMENT,
-        value_fn=lambda d: d.get("pages_left")),
+        state_class=SensorStateClass.MEASUREMENT, value_fn=lambda s: s.pages_left),
     KOReaderSensorEntityDescription(
         key="pages_left_chapter", name="Pages left in chapter",
         icon="mdi:book-arrow-right-outline", state_class=SensorStateClass.MEASUREMENT,
-        value_fn=lambda d: d.get("pages_left_chapter")),
+        value_fn=lambda s: s.pages_left_chapter),
     KOReaderSensorEntityDescription(
         key="time_to_finish_book", name="Time to finish book",
         device_class=SensorDeviceClass.DURATION, native_unit_of_measurement=UnitOfTime.MINUTES,
-        state_class=SensorStateClass.MEASUREMENT,
-        value_fn=lambda d: d.get("time_to_finish_book_min")),
+        state_class=SensorStateClass.MEASUREMENT, value_fn=lambda s: s.time_to_finish_book_min),
     KOReaderSensorEntityDescription(
         key="time_to_finish_chapter", name="Time to finish chapter",
         device_class=SensorDeviceClass.DURATION, native_unit_of_measurement=UnitOfTime.MINUTES,
-        state_class=SensorStateClass.MEASUREMENT,
-        value_fn=lambda d: d.get("time_to_finish_chapter_min")),
+        state_class=SensorStateClass.MEASUREMENT, value_fn=lambda s: s.time_to_finish_chapter_min),
     KOReaderSensorEntityDescription(
         key="book_format", name="Book format", icon="mdi:file-document-outline",
-        value_fn=lambda d: d.get("book_format")),
+        value_fn=lambda s: s.book_format),
     KOReaderSensorEntityDescription(
         key="book_language", name="Book language", icon="mdi:translate",
-        value_fn=lambda d: d.get("book_language")),
+        value_fn=lambda s: s.book_language),
     KOReaderSensorEntityDescription(
         key="book_series", name="Book series", icon="mdi:bookshelf",
-        value_fn=lambda d: d.get("book_series")),
+        value_fn=lambda s: s.book_series),
     KOReaderSensorEntityDescription(
-        key="total_time", name="Total reading time",
-        device_class=SensorDeviceClass.DURATION, native_unit_of_measurement=UnitOfTime.MINUTES,
-        state_class=SensorStateClass.TOTAL_INCREASING,
-        value_fn=lambda d: d.get("total_time_min")),
+        key="total_time", name="Total reading time", device_class=SensorDeviceClass.DURATION,
+        native_unit_of_measurement=UnitOfTime.MINUTES, state_class=SensorStateClass.TOTAL_INCREASING,
+        value_fn=lambda s: s.total_time_min),
     KOReaderSensorEntityDescription(
         key="annotations", name="Annotations", icon="mdi:marker",
-        state_class=SensorStateClass.MEASUREMENT,
-        value_fn=lambda d: d.get("annotations_count")),
+        state_class=SensorStateClass.MEASUREMENT, value_fn=lambda s: s.annotations_count),
 )
 
 
@@ -162,4 +119,7 @@ class KOReaderSensor(KOReaderEntity, SensorEntity):
 
     @property
     def native_value(self) -> Any:
-        return self.entity_description.value_fn(self._payload)
+        snapshot = self._snapshot
+        if snapshot is None:
+            return None
+        return self.entity_description.value_fn(snapshot)
