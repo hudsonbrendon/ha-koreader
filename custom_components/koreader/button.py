@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+from pykoreader import commands as kcmd
+
 from homeassistant.components.button import ButtonEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import CMD_PAGE_TURN, CMD_REFRESH, CMD_SYNC_NOW, queue_command
 from .entity import KOReaderEntity
 
 
@@ -28,8 +29,6 @@ class KOReaderButton(KOReaderEntity, ButtonEntity):
 
     @property
     def available(self) -> bool:
-        # Buttons are always available: they enqueue commands regardless of
-        # whether a webhook payload has been received yet.
         return True
 
 
@@ -42,7 +41,7 @@ class KOReaderSyncButton(KOReaderButton):
         self._attr_unique_id = f"{entry.entry_id}_force_sync"
 
     async def async_press(self) -> None:
-        queue_command(self._entry.runtime_data, {"type": CMD_SYNC_NOW})
+        self._entry.runtime_data.queue.add(kcmd.sync_now())
 
 
 class KOReaderNextPageButton(KOReaderButton):
@@ -54,9 +53,7 @@ class KOReaderNextPageButton(KOReaderButton):
         self._attr_unique_id = f"{entry.entry_id}_next_page"
 
     async def async_press(self) -> None:
-        queue_command(
-            self._entry.runtime_data, {"type": CMD_PAGE_TURN, "value": 1}
-        )
+        self._entry.runtime_data.queue.add(kcmd.page_turn(1))
 
 
 class KOReaderPrevPageButton(KOReaderButton):
@@ -68,9 +65,7 @@ class KOReaderPrevPageButton(KOReaderButton):
         self._attr_unique_id = f"{entry.entry_id}_prev_page"
 
     async def async_press(self) -> None:
-        queue_command(
-            self._entry.runtime_data, {"type": CMD_PAGE_TURN, "value": -1}
-        )
+        self._entry.runtime_data.queue.add(kcmd.page_turn(-1))
 
 
 class KOReaderRefreshButton(KOReaderButton):
@@ -82,4 +77,4 @@ class KOReaderRefreshButton(KOReaderButton):
         self._attr_unique_id = f"{entry.entry_id}_refresh"
 
     async def async_press(self) -> None:
-        queue_command(self._entry.runtime_data, {"type": CMD_REFRESH})
+        self._entry.runtime_data.queue.add(kcmd.refresh())

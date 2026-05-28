@@ -1,23 +1,22 @@
-"""Switch: liga/desliga o WiFi do Kindle (afeta o próprio canal — use com cuidado)."""
+"""Switch: liga/desliga o WiFi e o frontlight do Kindle."""
 
 from __future__ import annotations
 
 from typing import Any
 
+from pykoreader import commands as kcmd
+
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import CMD_SET_FRONTLIGHT_POWER, CMD_SET_WIFI, queue_command
 from .entity import KOReaderEntity
 
 
 async def async_setup_entry(
     hass: HomeAssistant, entry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    async_add_entities(
-        [KOReaderWifiSwitch(entry), KOReaderFrontlightSwitch(entry)]
-    )
+    async_add_entities([KOReaderWifiSwitch(entry), KOReaderFrontlightSwitch(entry)])
 
 
 class KOReaderWifiSwitch(KOReaderEntity, SwitchEntity):
@@ -30,19 +29,18 @@ class KOReaderWifiSwitch(KOReaderEntity, SwitchEntity):
 
     @property
     def available(self) -> bool:
-        # Control entities are always available: they enqueue commands even before
-        # the first webhook payload arrives.
         return True
 
     @property
     def is_on(self) -> bool:
-        return bool(self._payload.get("wifi_connected"))
+        snapshot = self._snapshot
+        return bool(snapshot is not None and snapshot.wifi_connected)
 
     async def async_turn_on(self, **kwargs: Any) -> None:
-        queue_command(self._entry.runtime_data, {"type": CMD_SET_WIFI, "value": True})
+        self._entry.runtime_data.queue.add(kcmd.set_wifi(True))
 
     async def async_turn_off(self, **kwargs: Any) -> None:
-        queue_command(self._entry.runtime_data, {"type": CMD_SET_WIFI, "value": False})
+        self._entry.runtime_data.queue.add(kcmd.set_wifi(False))
 
 
 class KOReaderFrontlightSwitch(KOReaderEntity, SwitchEntity):
@@ -55,22 +53,15 @@ class KOReaderFrontlightSwitch(KOReaderEntity, SwitchEntity):
 
     @property
     def available(self) -> bool:
-        # Control entities are always available: they enqueue commands even before
-        # the first webhook payload arrives.
         return True
 
     @property
     def is_on(self) -> bool:
-        return bool(self._payload.get("frontlight_on"))
+        snapshot = self._snapshot
+        return bool(snapshot is not None and snapshot.frontlight_on)
 
     async def async_turn_on(self, **kwargs: Any) -> None:
-        queue_command(
-            self._entry.runtime_data,
-            {"type": CMD_SET_FRONTLIGHT_POWER, "value": True},
-        )
+        self._entry.runtime_data.queue.add(kcmd.set_frontlight_power(True))
 
     async def async_turn_off(self, **kwargs: Any) -> None:
-        queue_command(
-            self._entry.runtime_data,
-            {"type": CMD_SET_FRONTLIGHT_POWER, "value": False},
-        )
+        self._entry.runtime_data.queue.add(kcmd.set_frontlight_power(False))
