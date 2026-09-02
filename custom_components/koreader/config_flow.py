@@ -8,4 +8,5 @@ config_entry_flow.register_webhook_flow(
     DOMAIN,
     "KOReader Webhook",
     {"docs_url": "https://github.com/hudsonbrendon/ha-koreader"},
+    allow_multiple=True,
 )
