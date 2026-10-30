@@ -2,25 +2,25 @@
   "config": {
     "step": {
       "user": {
-        "title": "Configurar KOReader",
-        "description": "Você quer iniciar a configuração do KOReader?"
+        "title": "Set up KOReader",
+        "description": "Do you want to start the KOReader setup?"
       }
     },
     "abort": {
-      "single_instance_allowed": "Já configurado.",
-      "webhook_not_internet_accessible": "Sua instância do Home Assistant precisa estar acessível pelo dispositivo para receber mensagens de webhook."
+      "single_instance_allowed": "Already configured.",
+      "webhook_not_internet_accessible": "Your Home Assistant instance must be reachable from the device to receive webhook messages."
     },
     "create_entry": {
-      "default": "Para enviar a telemetria do KOReader ao Home Assistant, configure o plugin com a URL de webhook:\n\n`{webhook_url}`"
+      "default": "To send KOReader telemetry to Home Assistant, configure the plugin with the webhook URL:\n\n`{webhook_url}`"
     }
   },
   "device_automation": {
     "trigger_type": {
-      "session_started": "Sessão de leitura iniciada",
-      "session_ended": "Sessão de leitura encerrada",
-      "book_finished": "Livro concluído",
-      "book_changed": "Livro trocado",
-      "highlight_added": "Marcação adicionada"
+      "session_started": "Reading session started",
+      "session_ended": "Reading session ended",
+      "book_finished": "Book finished",
+      "book_changed": "Book changed",
+      "highlight_added": "Highlight added"
     }
   }
 }

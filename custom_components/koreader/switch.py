@@ -4,17 +4,21 @@ from __future__ import annotations
 
 from typing import Any
 
-from pykoreader import commands as kcmd
-
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from pykoreader import commands as kcmd
 
+from . import KOReaderConfigEntry
 from .entity import KOReaderEntity
+
+PARALLEL_UPDATES = 1
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: KOReaderConfigEntry,
+    async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     async_add_entities(
         [
@@ -29,7 +33,7 @@ class KOReaderWifiSwitch(KOReaderEntity, SwitchEntity):
     _attr_name = "WiFi"
     _attr_icon = "mdi:wifi"
 
-    def __init__(self, entry) -> None:
+    def __init__(self, entry: KOReaderConfigEntry) -> None:
         super().__init__(entry)
         self._attr_unique_id = f"{entry.entry_id}_wifi"
 
@@ -53,7 +57,7 @@ class KOReaderFrontlightSwitch(KOReaderEntity, SwitchEntity):
     _attr_name = "Frontlight"
     _attr_icon = "mdi:lightbulb"
 
-    def __init__(self, entry) -> None:
+    def __init__(self, entry: KOReaderConfigEntry) -> None:
         super().__init__(entry)
         self._attr_unique_id = f"{entry.entry_id}_frontlight_power"
 
@@ -80,7 +84,7 @@ class KOReaderDarkModeSwitch(KOReaderEntity, SwitchEntity):
     _attr_icon = "mdi:theme-light-dark"
     _attr_assumed_state = True
 
-    def __init__(self, entry) -> None:
+    def __init__(self, entry: KOReaderConfigEntry) -> None:
         super().__init__(entry)
         self._attr_unique_id = f"{entry.entry_id}_dark_mode"
         self._attr_is_on = False

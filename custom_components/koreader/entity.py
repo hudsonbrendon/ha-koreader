@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from pykoreader import Snapshot
-
 from homeassistant.core import callback
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity
+from pykoreader import Snapshot
 
+from . import KOReaderConfigEntry
 from .const import DOMAIN, signal_update
 
 
@@ -18,7 +18,8 @@ class KOReaderEntity(Entity):
     _attr_should_poll = False
     _attr_has_entity_name = True
 
-    def __init__(self, entry) -> None:
+    def __init__(self, entry: KOReaderConfigEntry) -> None:
+        """Guarda a entry e monta o DeviceInfo a partir do último snapshot."""
         self._entry = entry
         model = "KOReader"
         sw_version = None

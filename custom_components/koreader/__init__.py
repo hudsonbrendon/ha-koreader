@@ -7,30 +7,24 @@ from datetime import datetime
 from functools import partial
 from http import HTTPStatus
 
-import voluptuous as vol
 from aiohttp import web
-from pykoreader import CommandQueue, Snapshot, commands as kcmd, parse_payload
-
 from homeassistant.components import webhook
-from homeassistant.config_entries import ConfigEntry, ConfigEntryState
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_WEBHOOK_ID, Platform
-from homeassistant.core import HomeAssistant, ServiceCall, callback
-from homeassistant.exceptions import ServiceValidationError
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import (
     config_entry_flow,
     config_validation as cv,
     device_registry as dr,
 )
 from homeassistant.helpers.dispatcher import async_dispatcher_send
+from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt as dt_util
+from pykoreader import CommandQueue, Snapshot, parse_payload
 
 from .const import (
     ATTR_DEVICE_ID,
     ATTR_EVENT_TYPE,
-    ATTR_MESSAGE,
-    ATTR_PAGE,
-    ATTR_PERCENT,
-    ATTR_TIMEOUT,
     DOMAIN,
     EVENT_BOOK_CHANGED,
     EVENT_BOOK_FINISHED,
@@ -38,11 +32,11 @@ from .const import (
     EVENT_KOREADER,
     EVENT_SESSION_ENDED,
     EVENT_SESSION_STARTED,
-    SERVICE_GO_TO_PAGE,
-    SERVICE_GO_TO_PERCENTAGE,
-    SERVICE_SHOW_MESSAGE,
     signal_update,
 )
+from .services import async_setup_services
+
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 PLATFORMS = [
     Platform.SENSOR,
@@ -52,27 +46,6 @@ PLATFORMS = [
     Platform.BUTTON,
     Platform.NOTIFY,
 ]
-
-SHOW_MESSAGE_SCHEMA = vol.Schema(
-    {
-        vol.Required(ATTR_MESSAGE): cv.string,
-        vol.Optional(ATTR_TIMEOUT): vol.All(vol.Coerce(int), vol.Range(min=1, max=120)),
-    }
-)
-
-GO_TO_PAGE_SCHEMA = vol.Schema(
-    {
-        vol.Required(ATTR_PAGE): vol.All(vol.Coerce(int), vol.Range(min=1)),
-    }
-)
-
-GO_TO_PERCENTAGE_SCHEMA = vol.Schema(
-    {
-        vol.Required(ATTR_PERCENT): vol.All(
-            vol.Coerce(float), vol.Range(min=0, max=100)
-        ),
-    }
-)
 
 
 @dataclass
@@ -123,7 +96,9 @@ def _async_update_device(
     if not (snapshot.device_model or snapshot.koreader_version):
         return
     registry = dr.async_get(hass)
-    device = registry.async_get_device(identifiers={(DOMAIN, entry.entry_id)})
+    device = registry.async_get_device_by_identifier(
+        (DOMAIN, entry.entry_id), entry.entry_id
+    )
     if device is None:
         return
     kwargs: dict[str, str] = {}
@@ -161,8 +136,10 @@ def _fire_transition_events(
         fired.append(EVENT_SESSION_STARTED)
 
     prev_progress = previous.progress_percent if previous else None
-    if current.progress_percent is not None and current.progress_percent >= 100 and (
-        prev_progress is None or prev_progress < 100
+    if (
+        current.progress_percent is not None
+        and current.progress_percent >= 100
+        and (prev_progress is None or prev_progress < 100)
     ):
         fired.append(EVENT_BOOK_FINISHED)
 
@@ -173,8 +150,8 @@ def _fire_transition_events(
     if not fired:
         return
 
-    device = dr.async_get(hass).async_get_device(
-        identifiers={(DOMAIN, entry.entry_id)}
+    device = dr.async_get(hass).async_get_device_by_identifier(
+        (DOMAIN, entry.entry_id), entry.entry_id
     )
     device_id = device.id if device else None
     for event_type in fired:
@@ -188,8 +165,14 @@ def _fire_transition_events(
         )
 
 
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    """Registra os serviços da integração (uma vez por instância do HA)."""
+    async_setup_services(hass)
+    return True
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: KOReaderConfigEntry) -> bool:
-    """Configura uma entry: webhook + plataformas + serviço."""
+    """Configura uma entry: webhook + plataformas."""
     entry.runtime_data = KOReaderRuntimeData()
 
     webhook.async_register(
@@ -201,8 +184,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: KOReaderConfigEntry) -> 
     )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-
-    _async_register_services(hass)
     return True
 
 
@@ -214,55 +195,3 @@ async def async_unload_entry(hass: HomeAssistant, entry: KOReaderConfigEntry) ->
 
 # Limpa o webhook registrado quando a config entry é removida.
 async_remove_entry = config_entry_flow.webhook_async_remove_entry
-
-
-@callback
-def _async_register_services(hass: HomeAssistant) -> None:
-    """Registra os serviços koreader.show_message e koreader.go_to_page (uma vez)."""
-    if hass.services.has_service(DOMAIN, SERVICE_SHOW_MESSAGE):
-        return
-
-    async def _show_message(call: ServiceCall) -> None:
-        for entry in hass.config_entries.async_entries(DOMAIN):
-            if entry.state is ConfigEntryState.LOADED:
-                entry.runtime_data.queue.add(
-                    kcmd.show_message(call.data[ATTR_MESSAGE], call.data.get(ATTR_TIMEOUT))
-                )
-
-    async def _go_to_page(call: ServiceCall) -> None:
-        page = call.data[ATTR_PAGE]
-        for entry in hass.config_entries.async_entries(DOMAIN):
-            if entry.state is ConfigEntryState.LOADED:
-                entry.runtime_data.queue.add(kcmd.goto_page(page))
-
-    async def _go_to_percentage(call: ServiceCall) -> None:
-        percent = call.data[ATTR_PERCENT]
-        queued = False
-        for entry in hass.config_entries.async_entries(DOMAIN):
-            if entry.state is not ConfigEntryState.LOADED:
-                continue
-            snapshot = entry.runtime_data.snapshot
-            total_pages = None if snapshot is None else snapshot.total_pages
-            if not total_pages:
-                continue
-            page = max(1, round(percent / 100 * total_pages))
-            entry.runtime_data.queue.add(kcmd.goto_page(page))
-            queued = True
-        if not queued:
-            raise ServiceValidationError(
-                "KOReader não tem total de páginas conhecido ainda; "
-                "aguarde um check-in ou use go_to_page."
-            )
-
-    hass.services.async_register(
-        DOMAIN, SERVICE_SHOW_MESSAGE, _show_message, schema=SHOW_MESSAGE_SCHEMA
-    )
-    hass.services.async_register(
-        DOMAIN, SERVICE_GO_TO_PAGE, _go_to_page, schema=GO_TO_PAGE_SCHEMA
-    )
-    hass.services.async_register(
-        DOMAIN,
-        SERVICE_GO_TO_PERCENTAGE,
-        _go_to_percentage,
-        schema=GO_TO_PERCENTAGE_SCHEMA,
-    )

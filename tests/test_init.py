@@ -1,10 +1,8 @@
 """Testa setup da entry, recebimento de webhook e resposta de comandos."""
 
-from homeassistant.components import webhook
 from homeassistant.const import CONF_WEBHOOK_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.setup import async_setup_component
-
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.koreader.const import DOMAIN

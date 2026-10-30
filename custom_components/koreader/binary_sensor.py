@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from pykoreader import Snapshot
+from datetime import datetime
 
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
@@ -12,12 +12,16 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.util import dt as dt_util
+from pykoreader import Snapshot
 
+from . import KOReaderConfigEntry
 from .const import CONNECTIVITY_TIMEOUT
 from .entity import KOReaderEntity
+
+PARALLEL_UPDATES = 0
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -42,7 +46,9 @@ BINARY_SENSORS: tuple[KOReaderBinarySensorEntityDescription, ...] = (
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: KOReaderConfigEntry,
+    async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     entities: list[BinarySensorEntity] = [
         KOReaderBinarySensor(entry, desc) for desc in BINARY_SENSORS
@@ -54,7 +60,11 @@ async def async_setup_entry(
 class KOReaderBinarySensor(KOReaderEntity, BinarySensorEntity):
     entity_description: KOReaderBinarySensorEntityDescription
 
-    def __init__(self, entry, description: KOReaderBinarySensorEntityDescription) -> None:
+    def __init__(
+        self,
+        entry: KOReaderConfigEntry,
+        description: KOReaderBinarySensorEntityDescription,
+    ) -> None:
         super().__init__(entry)
         self.entity_description = description
         self._attr_unique_id = f"{entry.entry_id}_{description.key}"
@@ -78,7 +88,7 @@ class KOReaderConnectivity(KOReaderEntity, BinarySensorEntity):
     _attr_name = "Status"
     _attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
 
-    def __init__(self, entry) -> None:
+    def __init__(self, entry: KOReaderConfigEntry) -> None:
         super().__init__(entry)
         self._attr_unique_id = f"{entry.entry_id}_connectivity"
 
@@ -97,7 +107,7 @@ class KOReaderConnectivity(KOReaderEntity, BinarySensorEntity):
         await super().async_added_to_hass()
 
         @callback
-        def _recheck(_now) -> None:
+        def _recheck(_now: datetime) -> None:
             self.async_write_ha_state()
 
         self.async_on_remove(

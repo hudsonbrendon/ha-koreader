@@ -2,17 +2,21 @@
 
 from __future__ import annotations
 
-from pykoreader import commands as kcmd
-
 from homeassistant.components.button import ButtonEntity
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from pykoreader import commands as kcmd
 
+from . import KOReaderConfigEntry
 from .entity import KOReaderEntity
+
+PARALLEL_UPDATES = 1
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: KOReaderConfigEntry,
+    async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     async_add_entities(
         [
@@ -41,7 +45,7 @@ class KOReaderSyncButton(KOReaderButton):
     _attr_name = "Force sync"
     _attr_icon = "mdi:sync"
 
-    def __init__(self, entry) -> None:
+    def __init__(self, entry: KOReaderConfigEntry) -> None:
         super().__init__(entry)
         self._attr_unique_id = f"{entry.entry_id}_force_sync"
 
@@ -53,7 +57,7 @@ class KOReaderNextPageButton(KOReaderButton):
     _attr_name = "Next page"
     _attr_icon = "mdi:chevron-right"
 
-    def __init__(self, entry) -> None:
+    def __init__(self, entry: KOReaderConfigEntry) -> None:
         super().__init__(entry)
         self._attr_unique_id = f"{entry.entry_id}_next_page"
 
@@ -65,7 +69,7 @@ class KOReaderPrevPageButton(KOReaderButton):
     _attr_name = "Previous page"
     _attr_icon = "mdi:chevron-left"
 
-    def __init__(self, entry) -> None:
+    def __init__(self, entry: KOReaderConfigEntry) -> None:
         super().__init__(entry)
         self._attr_unique_id = f"{entry.entry_id}_prev_page"
 
@@ -77,7 +81,7 @@ class KOReaderRefreshButton(KOReaderButton):
     _attr_name = "Refresh screen"
     _attr_icon = "mdi:refresh"
 
-    def __init__(self, entry) -> None:
+    def __init__(self, entry: KOReaderConfigEntry) -> None:
         super().__init__(entry)
         self._attr_unique_id = f"{entry.entry_id}_refresh"
 
@@ -89,7 +93,7 @@ class KOReaderNextChapterButton(KOReaderButton):
     _attr_name = "Next chapter"
     _attr_icon = "mdi:chevron-double-right"
 
-    def __init__(self, entry) -> None:
+    def __init__(self, entry: KOReaderConfigEntry) -> None:
         super().__init__(entry)
         self._attr_unique_id = f"{entry.entry_id}_next_chapter"
 
@@ -101,7 +105,7 @@ class KOReaderPrevChapterButton(KOReaderButton):
     _attr_name = "Previous chapter"
     _attr_icon = "mdi:chevron-double-left"
 
-    def __init__(self, entry) -> None:
+    def __init__(self, entry: KOReaderConfigEntry) -> None:
         super().__init__(entry)
         self._attr_unique_id = f"{entry.entry_id}_prev_chapter"
 
@@ -113,7 +117,7 @@ class KOReaderToggleBookmarkButton(KOReaderButton):
     _attr_name = "Toggle bookmark"
     _attr_icon = "mdi:bookmark-outline"
 
-    def __init__(self, entry) -> None:
+    def __init__(self, entry: KOReaderConfigEntry) -> None:
         super().__init__(entry)
         self._attr_unique_id = f"{entry.entry_id}_toggle_bookmark"
 
@@ -125,7 +129,7 @@ class KOReaderSuspendButton(KOReaderButton):
     _attr_name = "Suspend"
     _attr_icon = "mdi:sleep"
 
-    def __init__(self, entry) -> None:
+    def __init__(self, entry: KOReaderConfigEntry) -> None:
         super().__init__(entry)
         self._attr_unique_id = f"{entry.entry_id}_suspend"
 
@@ -137,7 +141,7 @@ class KOReaderRestartButton(KOReaderButton):
     _attr_name = "Restart"
     _attr_icon = "mdi:restart"
 
-    def __init__(self, entry) -> None:
+    def __init__(self, entry: KOReaderConfigEntry) -> None:
         super().__init__(entry)
         self._attr_unique_id = f"{entry.entry_id}_restart"
 

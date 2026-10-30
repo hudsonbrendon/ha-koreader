@@ -3,7 +3,6 @@
 import threading
 
 import pytest
-
 import pytest_homeassistant_custom_component.plugins as ha_plugins
 
 # Nome da thread daemon efêmera que o loop.shutdown_default_executor() do harness

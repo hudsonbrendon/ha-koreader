@@ -2,17 +2,21 @@
 
 from __future__ import annotations
 
-from pykoreader import commands as kcmd
-
 from homeassistant.components.notify import NotifyEntity
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from pykoreader import commands as kcmd
 
+from . import KOReaderConfigEntry
 from .entity import KOReaderEntity
+
+PARALLEL_UPDATES = 1
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: KOReaderConfigEntry,
+    async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     async_add_entities([KOReaderNotify(entry)])
 
@@ -23,7 +27,7 @@ class KOReaderNotify(KOReaderEntity, NotifyEntity):
     _attr_name = "Notify"
     _attr_icon = "mdi:message-text"
 
-    def __init__(self, entry) -> None:
+    def __init__(self, entry: KOReaderConfigEntry) -> None:
         super().__init__(entry)
         self._attr_unique_id = f"{entry.entry_id}_notify"
 
