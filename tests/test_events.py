@@ -3,7 +3,6 @@
 from homeassistant.const import CONF_WEBHOOK_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.setup import async_setup_component
-
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     async_capture_events,

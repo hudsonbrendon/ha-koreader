@@ -2,17 +2,21 @@
 
 from __future__ import annotations
 
-from pykoreader import commands as kcmd
-
 from homeassistant.components.number import NumberEntity, NumberMode
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from pykoreader import commands as kcmd
 
+from . import KOReaderConfigEntry
 from .entity import KOReaderEntity
+
+PARALLEL_UPDATES = 1
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: KOReaderConfigEntry,
+    async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     async_add_entities([KOReaderFrontlight(entry), KOReaderWarmth(entry)])
 
@@ -34,7 +38,7 @@ class KOReaderFrontlight(_KOReaderSliderBase):
     _attr_name = "Frontlight"
     _attr_icon = "mdi:brightness-6"
 
-    def __init__(self, entry) -> None:
+    def __init__(self, entry: KOReaderConfigEntry) -> None:
         super().__init__(entry)
         self._attr_unique_id = f"{entry.entry_id}_frontlight"
 
@@ -52,7 +56,7 @@ class KOReaderWarmth(_KOReaderSliderBase):
     _attr_name = "Warmth"
     _attr_icon = "mdi:weather-sunny"
 
-    def __init__(self, entry) -> None:
+    def __init__(self, entry: KOReaderConfigEntry) -> None:
         super().__init__(entry)
         self._attr_unique_id = f"{entry.entry_id}_warmth"
 

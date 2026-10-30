@@ -1,0 +1,30 @@
+name: Release
+on:
+  push:
+    branches: [main]
+    paths:
+      - custom_components/koreader/manifest.json
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read manifest version
+        id: ver
+        run: |
+          V=$(python -c "import json;print(json.load(open('custom_components/koreader/manifest.json'))['version'])")
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+      - name: Create release if tag is new
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="v${{ steps.ver.outputs.version }}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists, skipping."
+          else
+            gh release create "$TAG" --title "$TAG" --generate-notes
+          fi

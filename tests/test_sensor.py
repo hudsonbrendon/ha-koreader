@@ -1,10 +1,8 @@
 """Testa que o webhook popula os sensores."""
 
-from homeassistant.components import webhook
 from homeassistant.const import CONF_WEBHOOK_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.setup import async_setup_component
-
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.koreader.const import DOMAIN
@@ -65,7 +63,9 @@ async def test_sensors_update_from_webhook(hass: HomeAssistant, hass_client_no_a
     assert hass.states.get("sensor.koreader_book_title").state == "Duna"
 
 
-async def test_new_sensors_update_from_webhook(hass: HomeAssistant, hass_client_no_auth):
+async def test_new_sensors_update_from_webhook(
+    hass: HomeAssistant, hass_client_no_auth
+):
     await _setup(hass)
     client = await hass_client_no_auth()
     resp = await client.post(f"/api/webhook/{WEBHOOK_ID}", json=PAYLOAD)
@@ -91,8 +91,8 @@ async def test_device_sw_version_from_koreader_version(
     await client.post(f"/api/webhook/{WEBHOOK_ID}", json=PAYLOAD)
     await hass.async_block_till_done()
 
-    device = dr.async_get(hass).async_get_device(
-        identifiers={(DOMAIN, entry.entry_id)}
+    device = dr.async_get(hass).async_get_device_by_identifier(
+        (DOMAIN, entry.entry_id), entry.entry_id
     )
     assert device is not None
     assert device.sw_version == "v2024.04"
