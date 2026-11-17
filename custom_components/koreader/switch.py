@@ -4,11 +4,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from pykoreader import commands as kcmd
-
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from pykoreader import commands as kcmd
 
 from .entity import KOReaderEntity
 

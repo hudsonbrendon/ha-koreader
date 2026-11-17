@@ -7,8 +7,6 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any
 
-from pykoreader import Snapshot
-
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
@@ -19,6 +17,7 @@ from homeassistant.const import PERCENTAGE, UnitOfTime
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import dt as dt_util
+from pykoreader import Snapshot
 
 from .entity import KOReaderEntity
 

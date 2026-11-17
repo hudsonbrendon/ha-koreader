@@ -9,8 +9,6 @@ from http import HTTPStatus
 
 import voluptuous as vol
 from aiohttp import web
-from pykoreader import CommandQueue, Snapshot, commands as kcmd, parse_payload
-
 from homeassistant.components import webhook
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import CONF_WEBHOOK_ID, Platform
@@ -18,11 +16,17 @@ from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import (
     config_entry_flow,
+)
+from homeassistant.helpers import (
     config_validation as cv,
+)
+from homeassistant.helpers import (
     device_registry as dr,
 )
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.util import dt as dt_util
+from pykoreader import CommandQueue, Snapshot, parse_payload
+from pykoreader import commands as kcmd
 
 from .const import (
     ATTR_DEVICE_ID,

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from pykoreader import Snapshot
 
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
@@ -15,6 +14,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.util import dt as dt_util
+from pykoreader import Snapshot
 
 from .const import CONNECTIVITY_TIMEOUT
 from .entity import KOReaderEntity

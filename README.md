@@ -1,8 +1,17 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/hudsonbrendon/ha-koreader/main/logo.png" alt="KOReader" width="320">
+  <img src="custom_components/koreader/brand/logo@2x.png" alt="KOReader" height="128">
 </p>
 
 # KOReader — Home Assistant Integration
+
+[![Tests](https://github.com/hudsonbrendon/ha-koreader/actions/workflows/tests.yml/badge.svg)](https://github.com/hudsonbrendon/ha-koreader/actions/workflows/tests.yml)
+[![Hassfest](https://github.com/hudsonbrendon/ha-koreader/actions/workflows/hassfest.yml/badge.svg)](https://github.com/hudsonbrendon/ha-koreader/actions/workflows/hassfest.yml)
+[![HACS](https://github.com/hudsonbrendon/ha-koreader/actions/workflows/validate.yml/badge.svg)](https://github.com/hudsonbrendon/ha-koreader/actions/workflows/validate.yml)
+[![Release](https://img.shields.io/github/v/release/hudsonbrendon/ha-koreader?sort=semver)](https://github.com/hudsonbrendon/ha-koreader/releases)
+[![Downloads](https://img.shields.io/github/downloads/hudsonbrendon/ha-koreader/total)](https://github.com/hudsonbrendon/ha-koreader/releases)
+[![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz/)
+[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.1.0%2B-18BCF2?logo=homeassistant&logoColor=white)](https://www.home-assistant.io/)
+[![License](https://img.shields.io/github/license/hudsonbrendon/ha-koreader)](LICENSE)
 
 Native Home Assistant integration for **KOReader** running on a Kindle (or any KOReader
 device). It ingests reading and device **telemetry** and lets you **control the device**
@@ -27,6 +36,9 @@ to Home Assistant. There are two modes:
 > they are not instant while the screen is off.
 
 ## Installation (HACS)
+
+[![Open in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=hudsonbrendon&repository=ha-koreader&category=integration)
+[![Add integration](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=koreader)
 
 1. HACS → Integrations → ⋮ → **Custom repositories**
 2. Add `https://github.com/hudsonbrendon/ha-koreader` as type **Integration**

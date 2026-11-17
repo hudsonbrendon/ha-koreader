@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-from pykoreader import commands as kcmd
-
 from homeassistant.components.number import NumberEntity, NumberMode
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from pykoreader import commands as kcmd
 
 from .entity import KOReaderEntity
 

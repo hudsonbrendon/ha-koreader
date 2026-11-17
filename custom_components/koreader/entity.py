@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-from pykoreader import Snapshot
-
 from homeassistant.core import callback
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity
+from pykoreader import Snapshot
 
 from .const import DOMAIN, signal_update
 
