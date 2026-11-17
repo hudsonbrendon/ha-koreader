@@ -31,6 +31,7 @@ async def test_create_entry_generates_webhook_id(
         cloud_stub = types.ModuleType("homeassistant.components.cloud")
         cloud_stub.async_active_subscription = lambda hass: False  # noqa: ARG005
         cloud_stub.async_create_cloudhook = None
+        cloud_stub.async_get_or_create_cloudhook = None
         cloud_stub.async_is_connected = lambda hass: False  # noqa: ARG005
         monkeypatch.setitem(
             sys.modules, "homeassistant.components.cloud", cloud_stub

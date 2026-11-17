@@ -91,8 +91,8 @@ async def test_device_sw_version_from_koreader_version(
     await client.post(f"/api/webhook/{WEBHOOK_ID}", json=PAYLOAD)
     await hass.async_block_till_done()
 
-    device = dr.async_get(hass).async_get_device(
-        identifiers={(DOMAIN, entry.entry_id)}
+    device = dr.async_get(hass).async_get_device_by_identifier(
+        (DOMAIN, entry.entry_id), entry.entry_id
     )
     assert device is not None
     assert device.sw_version == "v2024.04"
